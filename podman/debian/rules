@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+export HOME = $(CURDIR)/debian/_build_home
+export GOPATH = $(CURDIR)/_build
+export GOFLAGS = -mod=vendor
+export PATH := /usr/lib/go-1.24/bin:$(PATH)
+
+PREFIX = /usr
+BUILDTAGS = seccomp systemd exclude_graphdriver_devicemapper
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	mkdir -p $(HOME)
+
+override_dh_auto_build:
+	$(MAKE) BUILDTAGS="$(BUILDTAGS)" PREFIX=$(PREFIX) podman rootlessport quadlet docs
+	$(MAKE) completions
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/podman PREFIX=$(PREFIX)
+	$(MAKE) install.completions DESTDIR=$(CURDIR)/debian/podman PREFIX=$(PREFIX)
+
+override_dh_auto_test:
+	# Tests require running container runtime and root/user namespaces
+
+override_dh_dwz:
+	# dwz does not work with Go binaries
+
+override_dh_strip:
+	# Do not strip Go binaries

@@ -1,0 +1,16 @@
+Source: rust-toolchain-1.86
+Section: devel
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13), xz-utils
+Standards-Version: 4.6.2
+Homepage: https://www.rust-lang.org/
+
+Package: rust-toolchain-1.86
+Architecture: arm64
+Depends: ${misc:Depends}, gcc, libc6-dev
+Provides: rust-compiler
+Description: Rust 1.86.0 toolchain for arm64 (binary repackage)
+ Official Rust 1.86.0 compiler toolchain repackaged as a .deb for
+ arm64/aarch64. Installs to /usr/lib/rust-1.86/ and provides rustc,
+ cargo, and the standard library. Does not conflict with system rustc.

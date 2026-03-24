@@ -1,0 +1,3 @@
+docker:
+  docker.io:
+    use-sigstore-attachments: false

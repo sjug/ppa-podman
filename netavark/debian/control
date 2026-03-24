@@ -1,0 +1,22 @@
+Source: netavark
+Section: admin
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13),
+               rust-toolchain-1.86,
+               libssl-dev,
+               manpages,
+               pkg-config,
+               protobuf-compiler
+Standards-Version: 4.6.2
+Homepage: https://github.com/containers/netavark
+
+Package: netavark
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, aardvark-dns, nftables
+Description: Container network stack
+ Netavark is a container network stack written in Rust. It is
+ designed to work with Podman but can be used with other OCI
+ container management applications. It provides bridge networking,
+ port forwarding, firewall rules, and DNS integration via
+ aardvark-dns.

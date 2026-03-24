@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        # Generate NVIDIA CDI spec if nvidia-ctk is available
+        if command -v nvidia-ctk >/dev/null 2>&1; then
+            echo "nvidia-ctk found, generating CDI specification..."
+            mkdir -p /etc/cdi
+            if [ -f /etc/cdi/nvidia.yaml ]; then
+                cp /etc/cdi/nvidia.yaml "/etc/cdi/nvidia.yaml.bak.$(date +%Y%m%d%H%M%S)"
+            fi
+            nvidia-ctk --quiet cdi generate --output=/etc/cdi/nvidia.yaml || true
+        fi
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

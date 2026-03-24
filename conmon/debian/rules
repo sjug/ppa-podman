@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE) bin/conmon \
+		PKG_CONFIG=pkg-config \
+		GIT_COMMIT=v2.2.1 \
+		BUILDTAGS="seccomp systemd"
+
+override_dh_auto_install:
+	install -D -m 0755 bin/conmon debian/conmon/usr/bin/conmon
+	install -D -m 0755 bin/conmon debian/conmon/usr/libexec/podman/conmon
+
+override_dh_auto_test:
+	# Tests require a running container runtime

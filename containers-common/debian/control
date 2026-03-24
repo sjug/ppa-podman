@@ -1,0 +1,18 @@
+Source: containers-common
+Section: admin
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://github.com/containers/common
+
+Package: containers-common
+Architecture: all
+Depends: ${misc:Depends}
+Breaks: podman (<< 4.9.0)
+Replaces: podman (<< 4.9.0)
+Description: Shared configuration for container tools (Podman, Buildah, Skopeo)
+ This package provides common configuration files shared between
+ container management tools including Podman, Buildah, and Skopeo.
+ Includes storage.conf, registries.conf, policy.json, containers.conf,
+ and default seccomp profiles.

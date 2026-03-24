@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+export HOME = $(CURDIR)/debian/_build_home
+export GOPATH = $(CURDIR)/_build
+export GOFLAGS = -mod=vendor
+export PATH := /usr/lib/go-1.24/bin:$(PATH)
+
+PREFIX = /usr
+BUILDTAGS = seccomp systemd exclude_graphdriver_devicemapper
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	mkdir -p $(HOME)
+
+override_dh_auto_build:
+	$(MAKE) BUILDTAGS="$(BUILDTAGS)" PREFIX=$(PREFIX) podman docker-docs
+
+override_dh_auto_install:
+	$(MAKE) install.docker DESTDIR=$(CURDIR)/debian/podman-docker PREFIX=$(PREFIX)
+	$(MAKE) install.docker-docs DESTDIR=$(CURDIR)/debian/podman-docker PREFIX=$(PREFIX)
+
+override_dh_auto_test:
+	# Tests require running container runtime
+
+override_dh_dwz:
+	# No binaries to process
+
+override_dh_strip:
+	# No binaries to strip

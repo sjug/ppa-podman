@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+export CARGO_HOME = $(CURDIR)/debian/cargo_home
+export PATH := /usr/lib/rust-1.86/bin:$(PATH)
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	mkdir -p .cargo
+	cp debian/cargo-vendor-config .cargo/config.toml
+
+override_dh_auto_build:
+	cargo build --release --offline
+
+override_dh_auto_install:
+	install -D -m 0755 target/release/netavark \
+		debian/netavark/usr/libexec/podman/netavark
+	install -D -m 0755 target/release/netavark \
+		debian/netavark/usr/bin/netavark
+
+override_dh_auto_test:
+	# Tests require network namespaces and root
+
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info

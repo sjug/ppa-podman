@@ -1,0 +1,7 @@
+rust-toolchain-1.86 (1.86.0~noble1) noble; urgency=medium
+
+  * Repackage official Rust 1.86.0 standalone binary for aarch64
+  * Provides rustc, cargo, and std library for arm64 builds
+  * Package for PPA: Podman 5.8.1 stack on Ubuntu 24.04 Noble arm64
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Sun, 23 Mar 2026 00:00:00 +0000

@@ -1,0 +1,30 @@
+Source: podman-docker
+Section: admin
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13),
+               golang-1.24-go,
+               go-md2man,
+               libgpgme-dev,
+               libseccomp-dev,
+               libsqlite3-dev,
+               libsystemd-dev,
+               libassuan-dev,
+               libbtrfs-dev,
+               pkg-config,
+               git,
+               python3,
+               bash-completion
+Standards-Version: 4.6.2
+Homepage: https://github.com/containers/podman
+
+Package: podman-docker
+Architecture: any
+Depends: ${misc:Depends}, podman
+Conflicts: docker.io, docker-ce, docker-ce-cli
+Provides: docker
+Description: Emulate Docker CLI using Podman
+ This package provides a Docker CLI compatibility layer using
+ Podman. It installs a /usr/bin/docker script that calls podman,
+ sets up DOCKER_HOST environment variable, creates a docker.sock
+ symlink to podman.sock, and provides docker-* man pages.

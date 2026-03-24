@@ -1,0 +1,23 @@
+Source: conmon
+Section: admin
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13),
+               gcc,
+               git,
+               golang-go,
+               libglib2.0-dev,
+               libseccomp-dev,
+               libsystemd-dev,
+               pkg-config
+Standards-Version: 4.6.2
+Homepage: https://github.com/containers/conmon
+
+Package: conmon
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: OCI container runtime monitor
+ Conmon is a monitoring program and communication tool between
+ a container manager (like Podman) and an OCI runtime (like crun)
+ for a single container. It handles logging, exit code reporting,
+ and attaching to the container.

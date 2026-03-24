@@ -1,0 +1,45 @@
+Source: podman
+Section: admin
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13),
+               bash-completion,
+               git,
+               go-md2man,
+               golang-1.24-go,
+               libapparmor-dev,
+               libbtrfs-dev,
+               libgpgme-dev,
+               libassuan-dev,
+               libseccomp-dev,
+               libsqlite3-dev,
+               libsystemd-dev,
+               pkg-config,
+               python3
+Standards-Version: 4.6.2
+Homepage: https://github.com/containers/podman
+
+Package: podman
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         catatonit,
+         conmon (>= 2.1.0),
+         containers-common,
+         crun,
+         netavark,
+         passt,
+         uidmap
+Recommends: aardvark-dns
+Suggests: buildah,
+          nvidia-container-toolkit,
+          podman-docker,
+          skopeo
+Description: Tool for managing OCI containers and pods
+ Podman is a daemonless, open source, Linux-native tool designed to
+ make it easy to find, run, build, share and deploy applications
+ using Open Containers Initiative (OCI) Containers and Container
+ Images. It provides a command-line interface familiar to anyone
+ who has used Docker. Podman supports rootless containers with
+ full pod management, networking via netavark/passt, and systemd
+ integration via Quadlet.

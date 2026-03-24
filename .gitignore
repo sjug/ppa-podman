@@ -1,0 +1,23 @@
+# VM images and state
+vm/
+*.qcow2
+*.iso
+*.img
+
+# GPG and sensitive data
+.env
+*.gpg
+*.asc
+
+# Build artifacts
+*.orig.tar.gz
+*.dsc
+*.changes
+*.buildinfo
+*.upload
+*.deb
+*.tar.xz
+
+# Extracted source directories
+*/*/vendor/
+*/*-[0-9]*/

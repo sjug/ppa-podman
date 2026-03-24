@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+export VERSION = 2026_01_20.386b5f5
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE) prefix=/usr VERSION=$(VERSION)
+
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/passt prefix=/usr
+
+override_dh_auto_test:
+	# Tests require network namespaces

@@ -1,0 +1,18 @@
+Source: aardvark-dns
+Section: admin
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13),
+               rust-toolchain-1.86,
+               pkg-config
+Standards-Version: 4.6.2
+Homepage: https://github.com/containers/aardvark-dns
+
+Package: aardvark-dns
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Container-focused DNS server
+ Aardvark-dns is a container DNS server used with Netavark to
+ provide name resolution for containers in Podman networks.
+ Containers can resolve each other by name within the same
+ network.

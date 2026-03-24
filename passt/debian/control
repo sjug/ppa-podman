@@ -1,0 +1,19 @@
+Source: passt
+Section: net
+Priority: optional
+Maintainer: Podman PPA Maintainer <maintainer@ppa>
+Build-Depends: debhelper-compat (= 13),
+               gcc,
+               libcap-dev
+Standards-Version: 4.6.2
+Homepage: https://passt.top/
+
+Package: passt
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: User-mode networking for VMs and containers
+ passt implements a translation layer between a Layer-2 network
+ interface and native Layer-4 sockets on the host. pasta (Pack
+ A Subtle Tap Abstraction) binds tap and socket namespaces for
+ rootless container networking. It is the default network mode
+ for rootless Podman 5+.

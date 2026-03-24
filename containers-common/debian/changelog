@@ -1,0 +1,7 @@
+containers-common (1.0.0~noble1) noble; urgency=medium
+
+  * Initial packaging of shared container configuration files
+  * Compatible with Podman 5.8.1
+  * Package for PPA: Podman 5.8.1 stack on Ubuntu 24.04 Noble arm64
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Sun, 23 Mar 2026 00:00:00 +0000
