@@ -3,6 +3,10 @@ set -euo pipefail
 
 # Download and prepare upstream source tarballs for PPA packaging
 # Each tarball is placed in its package directory as <pkg>_<ver>.orig.tar.gz
+#
+# IMPORTANT: Rust packages (netavark, aardvark-dns) must be vendored with
+# Rust 1.86, not the system Rust. Ensure /usr/local/bin/cargo is 1.86 before
+# running this script. See CLAUDE.md for setup instructions.
 
 BASEDIR="$(cd "$(dirname "$0")/.." && pwd)"
 TMPDIR="$(mktemp -d)"
@@ -16,6 +20,14 @@ NC='\033[0m'
 info()  { echo -e "${GREEN}[INFO]${NC} $*"; }
 warn()  { echo -e "${YELLOW}[WARN]${NC} $*"; }
 error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+
+# Verify Rust version for vendoring
+CARGO_VER=$(cargo --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' || echo "none")
+if [[ "$CARGO_VER" != 1.86.* ]]; then
+    warn "cargo version is $CARGO_VER, expected 1.86.x"
+    warn "Rust packages may fail to build if vendored with wrong version"
+    warn "See CLAUDE.md for Rust 1.86 setup instructions"
+fi
 
 # ---------- conmon 2.2.1 ----------
 pkg_conmon() {
@@ -31,7 +43,6 @@ pkg_conmon() {
 pkg_crun() {
     info "Downloading crun 1.26..."
     cd "$TMPDIR"
-    # Use the release tarball which includes generated configure script
     curl -sSL -o crun-1.26.tar.gz \
         "https://github.com/containers/crun/releases/download/1.26/crun-1.26.tar.gz"
     cp crun-1.26.tar.gz "$BASEDIR/crun/crun_1.26.orig.tar.gz"
@@ -44,22 +55,22 @@ pkg_passt() {
     cd "$TMPDIR"
     git clone --depth 1 --branch 2026_01_20.386b5f5 \
         https://passt.top/passt passt-0.0~git20260120.386b5f5
-    # Remove .git to reduce tarball size
     rm -rf passt-0.0~git20260120.386b5f5/.git
     tar czf passt_0.0~git20260120.386b5f5.orig.tar.gz passt-0.0~git20260120.386b5f5/
     cp passt_0.0~git20260120.386b5f5.orig.tar.gz "$BASEDIR/passt/"
     info "passt done."
 }
 
-# ---------- netavark 1.13.1 (with vendored Rust deps) ----------
+# ---------- netavark 1.17.2 (with vendored Rust deps) ----------
 pkg_netavark() {
-    info "Downloading netavark 1.13.1 and vendoring Rust deps..."
+    local ver="1.17.2"
+    local dsver="${ver}+ds"
+    info "Downloading netavark ${ver} and vendoring Rust deps..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch v1.13.1 \
-        https://github.com/containers/netavark.git netavark-1.13.1
-    cd netavark-1.13.1
+    git clone --depth 1 --branch "v${ver}" \
+        https://github.com/containers/netavark.git "netavark-${dsver}"
+    cd "netavark-${dsver}"
     cargo vendor
-    # Create .cargo/config.toml for offline builds
     mkdir -p .cargo
     cat > .cargo/config.toml <<'TOML'
 [source.crates-io]
@@ -70,18 +81,20 @@ directory = "vendor"
 TOML
     rm -rf .git
     cd "$TMPDIR"
-    tar czf netavark_1.13.1.orig.tar.gz netavark-1.13.1/
-    cp netavark_1.13.1.orig.tar.gz "$BASEDIR/netavark/"
+    tar czf "netavark_${dsver}.orig.tar.gz" "netavark-${dsver}/"
+    cp "netavark_${dsver}.orig.tar.gz" "$BASEDIR/netavark/"
     info "netavark done."
 }
 
-# ---------- aardvark-dns 1.13.1 (with vendored Rust deps) ----------
+# ---------- aardvark-dns 1.17.0 (with vendored Rust deps) ----------
 pkg_aardvark() {
-    info "Downloading aardvark-dns 1.13.1 and vendoring Rust deps..."
+    local ver="1.17.0"
+    local dsver="${ver}+ds"
+    info "Downloading aardvark-dns ${ver} and vendoring Rust deps..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch v1.13.1 \
-        https://github.com/containers/aardvark-dns.git aardvark-dns-1.13.1
-    cd aardvark-dns-1.13.1
+    git clone --depth 1 --branch "v${ver}" \
+        https://github.com/containers/aardvark-dns.git "aardvark-dns-${dsver}"
+    cd "aardvark-dns-${dsver}"
     cargo vendor
     mkdir -p .cargo
     cat > .cargo/config.toml <<'TOML'
@@ -93,8 +106,8 @@ directory = "vendor"
 TOML
     rm -rf .git
     cd "$TMPDIR"
-    tar czf aardvark-dns_1.13.1.orig.tar.gz aardvark-dns-1.13.1/
-    cp aardvark-dns_1.13.1.orig.tar.gz "$BASEDIR/aardvark-dns/"
+    tar czf "aardvark-dns_${dsver}.orig.tar.gz" "aardvark-dns-${dsver}/"
+    cp "aardvark-dns_${dsver}.orig.tar.gz" "$BASEDIR/aardvark-dns/"
     info "aardvark-dns done."
 }
 
@@ -113,12 +126,22 @@ pkg_podman() {
     info "podman done."
 }
 
+# ---------- rust-toolchain 1.86.0 (aarch64 standalone binary) ----------
+pkg_rust_toolchain() {
+    info "Downloading Rust 1.86.0 standalone for aarch64..."
+    cd "$TMPDIR"
+    curl -sSL -o rust-1.86.0-aarch64.tar.xz \
+        "https://static.rust-lang.org/dist/rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz"
+    cp rust-1.86.0-aarch64.tar.xz "$BASEDIR/rust-toolchain/"
+    info "rust-toolchain done."
+}
+
 # ---------- containers-common (no download needed) ----------
 pkg_containers_common() {
     info "containers-common is a native package, no upstream tarball needed."
 }
 
-# Run all in sequence (parallel would fight over network/disk)
+# Run all in sequence
 info "=== Downloading all upstream sources ==="
 info "Working in: $TMPDIR"
 echo
@@ -129,8 +152,9 @@ pkg_passt
 pkg_netavark
 pkg_aardvark
 pkg_podman
+pkg_rust_toolchain
 pkg_containers_common
 
 echo
 info "=== All source tarballs ready ==="
-ls -lh "$BASEDIR"/*//*.orig.tar.gz 2>/dev/null || true
+ls -lh "$BASEDIR"/*/*.orig.tar.gz "$BASEDIR"/rust-toolchain/*.tar.xz 2>/dev/null || true

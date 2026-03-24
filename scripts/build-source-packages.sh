@@ -107,12 +107,12 @@ info "=== Building source packages ==="
 echo
 
 # Quilt (upstream tarball) packages
-build_quilt_package "conmon"      "2.2.1"                          "conmon_2.2.1.orig.tar.gz"
-build_quilt_package "crun"        "1.26"                           "crun_1.26.orig.tar.gz"
-build_quilt_package "passt"       "0.0~git20260120.386b5f5"        "passt_0.0~git20260120.386b5f5.orig.tar.gz"
-build_quilt_package "netavark"    "1.13.1"                         "netavark_1.13.1.orig.tar.gz"
-build_quilt_package "aardvark-dns" "1.13.1"                        "aardvark-dns_1.13.1.orig.tar.gz"
-build_quilt_package "podman"      "5.8.1"                          "podman_5.8.1.orig.tar.gz"
+build_quilt_package "conmon"       "2.2.1"                          "conmon_2.2.1.orig.tar.gz"
+build_quilt_package "crun"         "1.26"                           "crun_1.26.orig.tar.gz"
+build_quilt_package "passt"        "0.0~git20260120.386b5f5"        "passt_0.0~git20260120.386b5f5.orig.tar.gz"
+build_quilt_package "netavark"     "1.17.2+ds"                      "netavark_1.17.2+ds.orig.tar.gz"
+build_quilt_package "aardvark-dns" "1.17.0+ds"                      "aardvark-dns_1.17.0+ds.orig.tar.gz"
+build_quilt_package "podman"       "5.8.1"                          "podman_5.8.1.orig.tar.gz"
 
 # Native package (no orig tarball)
 cd "$BASEDIR/containers-common"
