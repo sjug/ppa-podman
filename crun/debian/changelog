@@ -1,3 +1,11 @@
+crun (1.27-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 1.27
+  * Security fix: CVE-2026-30892 (wrong user in crun exec -u)
+  * Mount handling improvements, cgroup fixes, resource leak fixes
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Sun, 13 Apr 2026 00:00:00 +0000
+
 crun (1.26-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 1.26

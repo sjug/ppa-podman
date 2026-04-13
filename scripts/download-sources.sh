@@ -39,13 +39,13 @@ pkg_conmon() {
     info "conmon done."
 }
 
-# ---------- crun 1.26 ----------
+# ---------- crun 1.27 ----------
 pkg_crun() {
-    info "Downloading crun 1.26..."
+    info "Downloading crun 1.27..."
     cd "$TMPDIR"
-    curl -sSL -o crun-1.26.tar.gz \
-        "https://github.com/containers/crun/releases/download/1.26/crun-1.26.tar.gz"
-    cp crun-1.26.tar.gz "$BASEDIR/crun/crun_1.26.orig.tar.gz"
+    curl -sSL -o crun-1.27.tar.gz \
+        "https://github.com/containers/crun/releases/download/1.27/crun-1.27.tar.gz"
+    cp crun-1.27.tar.gz "$BASEDIR/crun/crun_1.27.orig.tar.gz"
     info "crun done."
 }
 
@@ -86,9 +86,9 @@ TOML
     info "netavark done."
 }
 
-# ---------- aardvark-dns 1.17.0 (with vendored Rust deps) ----------
+# ---------- aardvark-dns 1.17.1 (with vendored Rust deps) ----------
 pkg_aardvark() {
-    local ver="1.17.0"
+    local ver="1.17.1"
     local dsver="${ver}+ds"
     info "Downloading aardvark-dns ${ver} and vendoring Rust deps..."
     cd "$TMPDIR"
