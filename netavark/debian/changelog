@@ -1,4 +1,4 @@
-netavark (1.17.2-1ppa1~noble1) noble; urgency=medium
+netavark (1.17.2+ds-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 1.17.2
   * Built with Rust 1.86 toolchain from PPA
