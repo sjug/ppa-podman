@@ -12,6 +12,11 @@ BASEDIR="$(cd "$(dirname "$0")/.." && pwd)"
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR"' EXIT
 
+ONLY_PKGS=()
+ONLY_FLAG=0
+
+KNOWN_PKGS=(conmon crun passt netavark aardvark-dns podman podman-docker rust-toolchain containers-common)
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -20,6 +25,60 @@ NC='\033[0m'
 info()  { echo -e "${GREEN}[INFO]${NC} $*"; }
 warn()  { echo -e "${YELLOW}[WARN]${NC} $*"; }
 error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --only)
+            ONLY_FLAG=1
+            shift
+            while [[ $# -gt 0 && ! "$1" =~ ^-- ]]; do
+                ONLY_PKGS+=("$1")
+                shift
+            done
+            ;;
+        *) echo "Usage: $0 [--only pkg1 pkg2 ...]"; exit 1 ;;
+    esac
+done
+
+if [[ $ONLY_FLAG -eq 1 && ${#ONLY_PKGS[@]} -eq 0 ]]; then
+    error "--only requires at least one package name"
+    error "Known packages: ${KNOWN_PKGS[*]}"
+    exit 1
+fi
+
+for pkg in "${ONLY_PKGS[@]}"; do
+    found=0
+    for known in "${KNOWN_PKGS[@]}"; do
+        [[ "$pkg" == "$known" ]] && { found=1; break; }
+    done
+    if [[ $found -eq 0 ]]; then
+        error "Unknown package: $pkg"
+        error "Known packages: ${KNOWN_PKGS[*]}"
+        exit 1
+    fi
+done
+
+should_download() {
+    local name="$1"
+    if [[ ${#ONLY_PKGS[@]} -eq 0 ]]; then
+        return 0
+    fi
+    for pkg in "${ONLY_PKGS[@]}"; do
+        [[ "$pkg" == "$name" ]] && return 0
+    done
+    return 1
+}
+
+# Ensure Go is in PATH (Noble installs to /usr/lib/go-1.24/bin/)
+if ! command -v go >/dev/null 2>&1; then
+    if [[ -d /usr/lib/go-1.24/bin ]]; then
+        export PATH="/usr/lib/go-1.24/bin:$PATH"
+        info "Added /usr/lib/go-1.24/bin to PATH"
+    else
+        error "Go not found. Install golang-1.24-go."
+        exit 1
+    fi
+fi
 
 # Verify Rust version for vendoring
 CARGO_VER=$(cargo --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' || echo "none")
@@ -111,18 +170,19 @@ TOML
     info "aardvark-dns done."
 }
 
-# ---------- podman 5.8.1 (with vendored Go deps) ----------
+# ---------- podman 5.8.2 (with vendored Go deps) ----------
 pkg_podman() {
-    info "Downloading podman 5.8.1 and vendoring Go deps..."
+    info "Downloading podman 5.8.2 and vendoring Go deps..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch v5.8.1 \
-        https://github.com/containers/podman.git podman-5.8.1
-    cd podman-5.8.1
+    git clone --depth 1 --branch v5.8.2 \
+        https://github.com/containers/podman.git podman-5.8.2
+    cd podman-5.8.2
     go mod vendor
     rm -rf .git
     cd "$TMPDIR"
-    tar czf podman_5.8.1.orig.tar.gz podman-5.8.1/
-    cp podman_5.8.1.orig.tar.gz "$BASEDIR/podman/"
+    tar czf podman_5.8.2.orig.tar.gz podman-5.8.2/
+    cp podman_5.8.2.orig.tar.gz "$BASEDIR/podman/"
+    cp podman_5.8.2.orig.tar.gz "$BASEDIR/podman-docker/podman-docker_5.8.2.orig.tar.gz"
     info "podman done."
 }
 
@@ -141,19 +201,25 @@ pkg_containers_common() {
     info "containers-common is a native package, no upstream tarball needed."
 }
 
-# Run all in sequence
-info "=== Downloading all upstream sources ==="
+if [[ ${#ONLY_PKGS[@]} -gt 0 ]]; then
+    info "=== Downloading sources: ${ONLY_PKGS[*]} ==="
+else
+    info "=== Downloading all upstream sources ==="
+fi
 info "Working in: $TMPDIR"
 echo
 
-pkg_conmon
-pkg_crun
-pkg_passt
-pkg_netavark
-pkg_aardvark
-pkg_podman
-pkg_rust_toolchain
-pkg_containers_common
+should_download "conmon"            && pkg_conmon
+should_download "crun"              && pkg_crun
+should_download "passt"             && pkg_passt
+should_download "netavark"          && pkg_netavark
+should_download "aardvark-dns"      && pkg_aardvark
+# pkg_podman produces the tarball used by both podman and podman-docker
+if should_download "podman" || should_download "podman-docker"; then
+    pkg_podman
+fi
+should_download "rust-toolchain"    && pkg_rust_toolchain
+should_download "containers-common" && pkg_containers_common
 
 echo
 info "=== All source tarballs ready ==="

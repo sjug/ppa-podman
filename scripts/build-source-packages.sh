@@ -2,10 +2,14 @@
 set -euo pipefail
 
 # Build Debian source packages (.dsc + .changes) for all components.
-# Usage: ./build-source-packages.sh [--sign KEYID]
+# Usage: ./build-source-packages.sh [--sign KEYID] [--only pkg1 pkg2 ...]
 
 BASEDIR="$(cd "$(dirname "$0")/.." && pwd)"
 SIGN_KEY=""
+ONLY_PKGS=()
+ONLY_FLAG=0
+
+KNOWN_PKGS=(conmon crun passt netavark aardvark-dns podman podman-docker containers-common)
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -19,8 +23,34 @@ error() { echo -e "${RED}[ERROR]${NC} $*" >&2; }
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --sign) SIGN_KEY="$2"; shift 2 ;;
-        *) echo "Usage: $0 [--sign GPGKEYID]"; exit 1 ;;
+        --only)
+            ONLY_FLAG=1
+            shift
+            while [[ $# -gt 0 && ! "$1" =~ ^-- ]]; do
+                ONLY_PKGS+=("$1")
+                shift
+            done
+            ;;
+        *) echo "Usage: $0 [--sign GPGKEYID] [--only pkg1 pkg2 ...]"; exit 1 ;;
     esac
+done
+
+if [[ $ONLY_FLAG -eq 1 && ${#ONLY_PKGS[@]} -eq 0 ]]; then
+    error "--only requires at least one package name"
+    error "Known packages: ${KNOWN_PKGS[*]}"
+    exit 1
+fi
+
+for pkg in "${ONLY_PKGS[@]}"; do
+    found=0
+    for known in "${KNOWN_PKGS[@]}"; do
+        [[ "$pkg" == "$known" ]] && { found=1; break; }
+    done
+    if [[ $found -eq 0 ]]; then
+        error "Unknown package: $pkg"
+        error "Known packages: ${KNOWN_PKGS[*]}"
+        exit 1
+    fi
 done
 
 # Load maintainer identity from .env
@@ -47,10 +77,31 @@ else
     warn "Building UNSIGNED source packages (use --sign KEYID for PPA upload)"
 fi
 
+if [[ ${#ONLY_PKGS[@]} -gt 0 ]]; then
+    info "Selective build: only building: ${ONLY_PKGS[*]}"
+fi
+
+# Helper: should we build this package?
+should_build() {
+    local name="$1"
+    if [[ ${#ONLY_PKGS[@]} -eq 0 ]]; then
+        return 0  # build all
+    fi
+    for pkg in "${ONLY_PKGS[@]}"; do
+        if [[ "$pkg" == "$name" ]]; then
+            return 0
+        fi
+    done
+    return 1  # skip
+}
+
 build_quilt_package() {
     local name="$1"
     local version="$2"
     local orig_tarball="$3"
+
+    should_build "$name" || { info "Skipping: ${name}"; return 0; }
+
     local src_dir="${name}-${version}"
 
     info "Building source package: ${name} ${version}"
@@ -91,6 +142,8 @@ build_quilt_package() {
 build_native_package() {
     local name="$1"
 
+    should_build "$name" || { info "Skipping: ${name}"; return 0; }
+
     info "Building native source package: ${name}"
     cd "$BASEDIR/$name"
 
@@ -112,12 +165,11 @@ build_quilt_package "crun"         "1.27"                           "crun_1.27.o
 build_quilt_package "passt"        "0.0~git20260120.386b5f5"        "passt_0.0~git20260120.386b5f5.orig.tar.gz"
 build_quilt_package "netavark"     "1.17.2+ds"                      "netavark_1.17.2+ds.orig.tar.gz"
 build_quilt_package "aardvark-dns" "1.17.1+ds"                      "aardvark-dns_1.17.1+ds.orig.tar.gz"
-build_quilt_package "podman"       "5.8.1"                          "podman_5.8.1.orig.tar.gz"
+build_quilt_package "podman"       "5.8.2"                          "podman_5.8.2.orig.tar.gz"
+build_quilt_package "podman-docker" "5.8.2"                         "podman-docker_5.8.2.orig.tar.gz"
 
 # Native package (no orig tarball)
-cd "$BASEDIR/containers-common"
-dpkg-buildpackage -S -d $SIGN_ARGS
-info "containers-common source package built."
+build_native_package "containers-common"
 
 echo
 info "=== All source packages built ==="

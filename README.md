@@ -1,6 +1,6 @@
-# Podman 5.8.1 PPA for Ubuntu 24.04 Noble (arm64)
+# Podman 5.8.2 PPA for Ubuntu 24.04 Noble (arm64)
 
-Launchpad PPA packaging for Podman 5.8.1 and all dependencies for full
+Launchpad PPA packaging for Podman 5.8.2 and all dependencies for full
 rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 **PPA:** [`ppa:sejug/podman`](https://launchpad.net/~sejug/+archive/ubuntu/podman)
@@ -9,8 +9,8 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 | Package | Version | Language | Purpose |
 |---|---|---|---|
-| podman | 5.8.1 | Go | Container management tool |
-| podman-docker | 5.8.1 | Shell | Docker CLI emulation via podman |
+| podman | 5.8.2 | Go | Container management tool |
+| podman-docker | 5.8.2 | Shell | Docker CLI emulation via podman |
 | conmon | 2.2.1 | C | Container runtime monitor |
 | crun | 1.26 | C | Fast OCI runtime |
 | passt | 2026_01_20 | C | Rootless networking (pasta) |
@@ -100,7 +100,25 @@ cp .env.example .env
 This keeps your email out of the public git history while satisfying Launchpad's
 signing requirements.
 
+### Booting the build VM
+
+All build steps run inside a QEMU/KVM Noble VM (SSH on port 2222). Boot it
+from the host with:
+
+```bash
+cd vm && qemu-system-x86_64 -name ppa-builder -machine type=q35,accel=kvm \
+  -cpu host -smp 16 -m 32768 -drive file=ppa-builder.qcow2,if=virtio \
+  -drive file=seed.iso,if=virtio,format=raw \
+  -net nic -net user,hostfwd=tcp::2222-:22 -display none -daemonize
+```
+
+Then `ssh -p 2222 $USER@localhost` to get a shell inside. See `CLAUDE.md`
+for how to create the VM from scratch, install Rust 1.86, and copy in the
+GPG signing key.
+
 ### Build steps
+
+Run these inside the VM:
 
 ```bash
 # 1. Install build tools
@@ -126,8 +144,8 @@ ppa-podman/
 │   ├── download-sources.sh         # Download & vendor upstream sources
 │   ├── build-source-packages.sh    # Build .dsc/.changes
 │   └── upload-ppa.sh              # Upload to Launchpad PPA
-├── podman/debian/                  # podman 5.8.1
-├── podman-docker/debian/           # podman-docker 5.8.1
+├── podman/debian/                  # podman 5.8.2
+├── podman-docker/debian/           # podman-docker 5.8.2
 ├── conmon/debian/                  # conmon 2.2.1
 ├── crun/debian/                    # crun 1.26
 ├── passt/debian/                   # passt 2026_01_20
