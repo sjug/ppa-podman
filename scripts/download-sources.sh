@@ -98,13 +98,13 @@ pkg_conmon() {
     info "conmon done."
 }
 
-# ---------- crun 1.27 ----------
+# ---------- crun 1.27.1 ----------
 pkg_crun() {
-    info "Downloading crun 1.27..."
+    info "Downloading crun 1.27.1..."
     cd "$TMPDIR"
-    curl -sSL -o crun-1.27.tar.gz \
-        "https://github.com/containers/crun/releases/download/1.27/crun-1.27.tar.gz"
-    cp crun-1.27.tar.gz "$BASEDIR/crun/crun_1.27.orig.tar.gz"
+    curl -sSL -o crun-1.27.1.tar.gz \
+        "https://github.com/containers/crun/releases/download/1.27.1/crun-1.27.1.tar.gz"
+    cp crun-1.27.1.tar.gz "$BASEDIR/crun/crun_1.27.1.orig.tar.gz"
     info "crun done."
 }
 

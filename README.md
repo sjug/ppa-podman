@@ -12,10 +12,10 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 | podman | 5.8.2 | Go | Container management tool |
 | podman-docker | 5.8.2 | Shell | Docker CLI emulation via podman |
 | conmon | 2.2.1 | C | Container runtime monitor |
-| crun | 1.26 | C | Fast OCI runtime |
+| crun | 1.27.1 | C | Fast OCI runtime |
 | passt | 2026_01_20 | C | Rootless networking (pasta) |
 | netavark | 1.17.2 | Rust | Container network stack |
-| aardvark-dns | 1.17.0 | Rust | Container DNS server |
+| aardvark-dns | 1.17.1 | Rust | Container DNS server |
 | containers-common | 1.0.0 | config | Shared config files |
 | rust-toolchain-1.86 | 1.86.0 | binary | Rust compiler for arm64 builds |
 
@@ -112,9 +112,34 @@ cd vm && qemu-system-x86_64 -name ppa-builder -machine type=q35,accel=kvm \
   -net nic -net user,hostfwd=tcp::2222-:22 -display none -daemonize
 ```
 
-Then `ssh -p 2222 $USER@localhost` to get a shell inside. See `CLAUDE.md`
-for how to create the VM from scratch, install Rust 1.86, and copy in the
-GPG signing key.
+Then `ssh -p 2222 YOUR_VM_USER@localhost` to get a shell inside. See
+`CLAUDE.md` for how to create the VM from scratch, install Rust 1.86, and copy
+in the GPG signing key.
+
+### Local path and SSH hygiene
+
+Keep machine-specific usernames and absolute paths out of the git repo. In
+committed docs, notes, and examples, use placeholders such as `$HOME`, `$USER`,
+and `YOUR_VM_USER` rather than `/home/alice` or a local login name.
+
+A typical local layout is:
+
+- host checkout: `$HOME/git/ppa-podman`
+- VM working tree: `~/ppa-podman`
+
+The VM copy only needs to be a synced working tree for builds; it does not have
+to be a Git checkout.
+
+Useful commands:
+
+```bash
+ssh -p 2222 YOUR_VM_USER@localhost
+scp -P 2222 some-file YOUR_VM_USER@localhost:~/ppa-podman/
+ssh-keygen -R '[localhost]:2222'   # if the VM was recreated and the host key changed
+```
+
+Note: `scp` uses uppercase `-P` for the port. `host:2222:path` is parsed as
+part of the remote path, not as the port number.
 
 ### Build steps
 
@@ -131,8 +156,24 @@ Run these inside the VM:
 ./scripts/build-source-packages.sh --sign YOUR_GPG_KEY_ID
 
 # 4. Upload to your PPA
-./scripts/upload-ppa.sh ppa:sejug/podman
+./scripts/upload-ppa.sh ppa:YOUR_LAUNCHPAD_USER/podman
 ```
+
+### Single-package update workflow
+
+For routine maintenance, it is usually safer to update one package at a time:
+
+```bash
+./scripts/download-sources.sh --only crun
+./scripts/build-source-packages.sh --only crun --sign YOUR_GPG_KEY_ID
+dput ppa:YOUR_LAUNCHPAD_USER/podman crun/crun_<version>_source.changes
+```
+
+### Upload safety
+
+`scripts/upload-ppa.sh` uploads every `*_source.changes` file it finds in the
+workspace. Use it only in a clean tree, or upload the exact `.changes` file you
+just built with `dput` when you only want to publish one package.
 
 ## Directory Structure
 
@@ -147,10 +188,10 @@ ppa-podman/
 ├── podman/debian/                  # podman 5.8.2
 ├── podman-docker/debian/           # podman-docker 5.8.2
 ├── conmon/debian/                  # conmon 2.2.1
-├── crun/debian/                    # crun 1.26
+├── crun/debian/                    # crun 1.27.1
 ├── passt/debian/                   # passt 2026_01_20
 ├── netavark/debian/                # netavark 1.17.2
-├── aardvark-dns/debian/            # aardvark-dns 1.17.0
+├── aardvark-dns/debian/            # aardvark-dns 1.17.1
 ├── containers-common/              # config files + debian/
 │   ├── storage.conf
 │   ├── registries.conf
