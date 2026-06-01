@@ -16,6 +16,7 @@ ONLY_PKGS=()
 ONLY_FLAG=0
 
 KNOWN_PKGS=(conmon crun passt netavark aardvark-dns podman podman-docker rust-toolchain containers-common)
+RUST_TOOLCHAIN_SHA256="2b97d1e09a1d7fdbed748332879318ee7f41c008837f87ccb44ec045df0a8a1b"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -98,25 +99,25 @@ pkg_conmon() {
     info "conmon done."
 }
 
-# ---------- crun 1.27.1 ----------
+# ---------- crun 1.28 ----------
 pkg_crun() {
-    info "Downloading crun 1.27.1..."
+    info "Downloading crun 1.28..."
     cd "$TMPDIR"
-    curl -sSL -o crun-1.27.1.tar.gz \
-        "https://github.com/containers/crun/releases/download/1.27.1/crun-1.27.1.tar.gz"
-    cp crun-1.27.1.tar.gz "$BASEDIR/crun/crun_1.27.1.orig.tar.gz"
+    curl -sSL -o crun-1.28.tar.gz \
+        "https://github.com/containers/crun/releases/download/1.28/crun-1.28.tar.gz"
+    cp crun-1.28.tar.gz "$BASEDIR/crun/crun_1.28.orig.tar.gz"
     info "crun done."
 }
 
 # ---------- passt ----------
 pkg_passt() {
-    info "Downloading passt 2026_01_20.386b5f5..."
+    info "Downloading passt 2026_05_26.038c51e..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch 2026_01_20.386b5f5 \
-        https://passt.top/passt passt-0.0~git20260120.386b5f5
-    rm -rf passt-0.0~git20260120.386b5f5/.git
-    tar czf passt_0.0~git20260120.386b5f5.orig.tar.gz passt-0.0~git20260120.386b5f5/
-    cp passt_0.0~git20260120.386b5f5.orig.tar.gz "$BASEDIR/passt/"
+    git clone --depth 1 --branch 2026_05_26.038c51e \
+        https://passt.top/passt passt-0.0~git20260526.038c51e
+    rm -rf passt-0.0~git20260526.038c51e/.git
+    tar czf passt_0.0~git20260526.038c51e.orig.tar.gz passt-0.0~git20260526.038c51e/
+    cp passt_0.0~git20260526.038c51e.orig.tar.gz "$BASEDIR/passt/"
     info "passt done."
 }
 
@@ -190,9 +191,12 @@ pkg_podman() {
 pkg_rust_toolchain() {
     info "Downloading Rust 1.86.0 standalone for aarch64..."
     cd "$TMPDIR"
-    curl -sSL -o rust-1.86.0-aarch64.tar.xz \
+    curl -sSL -o rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz \
         "https://static.rust-lang.org/dist/rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz"
-    cp rust-1.86.0-aarch64.tar.xz "$BASEDIR/rust-toolchain/"
+    printf '%s  %s\n' \
+        "$RUST_TOOLCHAIN_SHA256" \
+        "rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz" | sha256sum -c -
+    cp rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz "$BASEDIR/rust-toolchain/rust-1.86.0-aarch64.tar.xz"
     info "rust-toolchain done."
 }
 

@@ -8,8 +8,10 @@ BASEDIR="$(cd "$(dirname "$0")/.." && pwd)"
 SIGN_KEY=""
 ONLY_PKGS=()
 ONLY_FLAG=0
+BUILD_TMPDIR="$(mktemp -d)"
 
-KNOWN_PKGS=(conmon crun passt netavark aardvark-dns podman podman-docker containers-common)
+KNOWN_PKGS=(rust-toolchain conmon crun passt netavark aardvark-dns podman podman-docker containers-common)
+trap 'rm -rf "$BUILD_TMPDIR"' EXIT
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -55,6 +57,7 @@ done
 
 # Load maintainer identity from .env
 if [[ -f "$BASEDIR/.env" ]]; then
+    # shellcheck source=/dev/null
     source "$BASEDIR/.env"
 fi
 
@@ -63,17 +66,21 @@ if [[ -z "${PPA_MAINTAINER:-}" ]]; then
     exit 1
 fi
 
-# Substitute placeholder in all packaging files
-info "Setting maintainer to: $PPA_MAINTAINER"
-find "$BASEDIR" -path '*/debian/changelog' -o -path '*/debian/control' | while read -r f; do
-    sed -i "s|Podman PPA Maintainer <maintainer@ppa>|${PPA_MAINTAINER}|g" "$f"
-done
+apply_maintainer() {
+    local debian_dir="$1"
+
+    find "$debian_dir" -type f \( -name changelog -o -name control \) | while read -r f; do
+        sed -i "s|Podman PPA Maintainer <maintainer@ppa>|${PPA_MAINTAINER}|g" "$f"
+    done
+}
+
+info "Using maintainer: $PPA_MAINTAINER"
 
 if [[ -n "$SIGN_KEY" ]]; then
-    SIGN_ARGS="-k${SIGN_KEY}"
+    SIGN_ARGS=("-k${SIGN_KEY}")
     info "Will sign packages with key: $SIGN_KEY"
 else
-    SIGN_ARGS="-us -uc"
+    SIGN_ARGS=("-us" "-uc")
     warn "Building UNSIGNED source packages (use --sign KEYID for PPA upload)"
 fi
 
@@ -122,6 +129,7 @@ build_quilt_package() {
 
     # Copy debian/ directory into source
     cp -a debian/ "$src_dir/debian/"
+    apply_maintainer "$src_dir/debian"
 
     # For Rust packages: ensure .cargo/config.toml is in place
     if [[ -f "debian/cargo-vendor-config" ]] && [[ -d "$src_dir/vendor" ]]; then
@@ -131,11 +139,11 @@ build_quilt_package() {
 
     # Build source package
     cd "$src_dir"
-    dpkg-buildpackage -S -d $SIGN_ARGS
+    dpkg-buildpackage -S -d "${SIGN_ARGS[@]}"
 
     info "${name} source package built."
     cd "$BASEDIR/$name"
-    ls -la *.dsc *.changes 2>/dev/null || true
+    ls -la ./*.dsc ./*.changes 2>/dev/null || true
     echo
 }
 
@@ -145,24 +153,40 @@ build_native_package() {
     should_build "$name" || { info "Skipping: ${name}"; return 0; }
 
     info "Building native source package: ${name}"
-    cd "$BASEDIR/$name"
+    local version
+    version=$(sed -n '1s/^[^(]*(\([^)]*\)).*/\1/p' "$BASEDIR/$name/debian/changelog")
+    if [[ -z "$version" ]]; then
+        error "Could not read package version from $name/debian/changelog"
+        exit 1
+    fi
 
-    dpkg-buildpackage -S -d $SIGN_ARGS
+    local work="$BUILD_TMPDIR/$name"
+    local src_dir="$work/${name}-${version}"
+    mkdir -p "$work"
+    cp -a "$BASEDIR/$name" "$src_dir"
+    apply_maintainer "$src_dir/debian"
+
+    cd "$src_dir"
+    dpkg-buildpackage -S -d "${SIGN_ARGS[@]}"
 
     info "${name} source package built."
-    cd "$BASEDIR"
-    ls -la "$name"/../*.dsc "$name"/../*.changes 2>/dev/null || \
-    ls -la "$name"/*.dsc "$name"/*.changes 2>/dev/null || true
+    find "$work" -maxdepth 1 -type f \( -name '*.dsc' -o -name '*.changes' -o -name '*.buildinfo' -o -name '*.tar.*' \) \
+        -exec cp -a {} "$BASEDIR/$name/" \;
+    cd "$BASEDIR/$name"
+    ls -la ./*.dsc ./*.changes 2>/dev/null || true
     echo
 }
 
 info "=== Building source packages ==="
 echo
 
+# Native package used as a build dependency by Rust packages.
+build_native_package "rust-toolchain"
+
 # Quilt (upstream tarball) packages
 build_quilt_package "conmon"       "2.2.1"                          "conmon_2.2.1.orig.tar.gz"
-build_quilt_package "crun"         "1.27.1"                         "crun_1.27.1.orig.tar.gz"
-build_quilt_package "passt"        "0.0~git20260120.386b5f5"        "passt_0.0~git20260120.386b5f5.orig.tar.gz"
+build_quilt_package "crun"         "1.28"                           "crun_1.28.orig.tar.gz"
+build_quilt_package "passt"        "0.0~git20260526.038c51e"        "passt_0.0~git20260526.038c51e.orig.tar.gz"
 build_quilt_package "netavark"     "1.17.2+ds"                      "netavark_1.17.2+ds.orig.tar.gz"
 build_quilt_package "aardvark-dns" "1.17.1+ds"                      "aardvark-dns_1.17.1+ds.orig.tar.gz"
 build_quilt_package "podman"       "5.8.2"                          "podman_5.8.2.orig.tar.gz"

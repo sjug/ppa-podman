@@ -1,3 +1,17 @@
+containers-common (1.0.0~noble4) noble; urgency=medium
+
+  * Explicitly set network firewall_driver = "nftables" in containers.conf
+    (systemd >= 259 no longer supports iptables; don't rely on netavark's
+    auto-pick)
+  * Re-sync seccomp.json verbatim from containers/common v0.67.1: drop
+    io_uring_* from the default allowlist (recurring kernel CVE source) and
+    restore capability-gated syscalls (ptrace, bpf, mount, perf_event_open,
+    process_vm_readv/writev, etc.) plus newer syscalls
+  * Supersedes the ~noble2 and ~noble3 PPA rebuilds, which were version-only
+    rebumps (to trigger arm64 builds) with no source changes
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 01 Jun 2026 13:17:12 -0400
+
 containers-common (1.0.0~noble1) noble; urgency=medium
 
   * Initial packaging of shared container configuration files

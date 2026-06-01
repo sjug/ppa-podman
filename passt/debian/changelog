@@ -1,3 +1,9 @@
+passt (0.0~git20260526.038c51e-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream snapshot 2026_05_26.038c51e
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 01 Jun 2026 13:17:12 -0400
+
 passt (0.0~git20260120.386b5f5-1ppa1~noble1) noble; urgency=medium
 
   * New upstream snapshot 2026_01_20.386b5f5

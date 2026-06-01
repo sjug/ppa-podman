@@ -1,3 +1,9 @@
+crun (1.28-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 1.28
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 01 Jun 2026 13:17:12 -0400
+
 crun (1.27.1-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 1.27.1
