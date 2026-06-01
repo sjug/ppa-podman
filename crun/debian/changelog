@@ -1,3 +1,11 @@
+crun (1.28-1ppa2~noble1) noble; urgency=medium
+
+  * Build-Depend on libjson-c-dev instead of libyajl-dev: crun 1.28 migrated
+    its JSON parser to json-c (>= 0.14) and no longer uses yajl, which made
+    1ppa1 fail to build (configure: json-c not found)
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 01 Jun 2026 13:17:12 -0400
+
 crun (1.28-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 1.28

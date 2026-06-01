@@ -12,7 +12,7 @@ Build-Depends: debhelper-compat (= 13),
                libseccomp-dev,
                libsystemd-dev,
                libtool,
-               libyajl-dev,
+               libjson-c-dev,
                pkg-config,
                python3
 Standards-Version: 4.6.2
