@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Podman PPA Maintainer <maintainer@ppa>
 Build-Depends: debhelper-compat (= 13),
-               rust-toolchain-1.86,
+               rust-toolchain-1.88,
                pkg-config
 Standards-Version: 4.6.2
 Homepage: https://github.com/containers/aardvark-dns

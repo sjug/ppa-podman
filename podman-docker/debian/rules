@@ -4,10 +4,13 @@ export DH_VERBOSE = 1
 export HOME = $(CURDIR)/debian/_build_home
 export GOPATH = $(CURDIR)/_build
 export GOFLAGS = -mod=vendor
-export PATH := /usr/lib/go-1.24/bin:$(PATH)
+export PATH := /usr/lib/go-1.25/bin:$(PATH)
 
 PREFIX = /usr
-BUILDTAGS = seccomp systemd exclude_graphdriver_devicemapper
+
+# BUILDTAGS left to podman's Makefile auto-detection (matches Arch). The podman
+# binary built here is discarded — only the docker wrapper and docker-* man
+# pages ship — so its feature tags do not matter.
 
 %:
 	dh $@
@@ -16,7 +19,7 @@ override_dh_auto_configure:
 	mkdir -p $(HOME)
 
 override_dh_auto_build:
-	$(MAKE) BUILDTAGS="$(BUILDTAGS)" PREFIX=$(PREFIX) podman docker-docs
+	$(MAKE) PREFIX=$(PREFIX) podman docker-docs
 
 override_dh_auto_install:
 	$(MAKE) install.docker DESTDIR=$(CURDIR)/debian/podman-docker PREFIX=$(PREFIX)

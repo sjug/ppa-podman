@@ -1,3 +1,51 @@
+podman (6.0.2-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 6.0.2
+  * Build against container-libs/common v0.68.1
+  * Build with Go 1.25.12 toolchain from PPA
+  * Let podman's Makefile auto-detect BUILDTAGS (matches Arch packaging);
+    pure-Go SQLite driver, no cgo libsqlite3
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Wed, 29 Jul 2026 09:13:40 -0400
+
+podman (6.0.0-1ppa5~noble1) noble; urgency=medium
+
+  * Build-depend on containers-common revision with upstream-synced Podman 6
+    config files
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 30 Jun 2026 11:40:00 -0400
+
+podman (6.0.0-1ppa4~noble1) noble; urgency=medium
+
+  * Build with PIE/external-linker hardening flags
+  * Enable AppArmor build tag on Ubuntu
+  * Add build-time container-libs/common version sanity check against
+    containers-common
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 30 Jun 2026 09:50:00 -0400
+
+podman (6.0.0-1ppa3~noble1) noble; urgency=medium
+
+  * Build podman-remote explicitly now that completions generation is skipped
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 30 Jun 2026 09:25:00 -0400
+
+podman (6.0.0-1ppa2~noble1) noble; urgency=medium
+
+  * Do not regenerate completions during build; Podman 6 refuses to run on
+    Launchpad's cgroup-v1 build hosts, and upstream tarballs already ship
+    generated completions
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 30 Jun 2026 08:20:00 -0400
+
+podman (6.0.0-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream major release 6.0.0
+  * Build with Go 1.25 toolchain from PPA
+  * Require Netavark/Aardvark 2.0.0 stack for Podman 6
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 29 Jun 2026 00:00:00 +0000
+
 podman (5.8.2-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 5.8.2

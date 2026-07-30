@@ -3,11 +3,10 @@ Section: admin
 Priority: optional
 Maintainer: Podman PPA Maintainer <maintainer@ppa>
 Build-Depends: debhelper-compat (= 13),
-               golang-1.24-go,
+               go-toolchain-1.25,
                go-md2man,
                libgpgme-dev,
                libseccomp-dev,
-               libsqlite3-dev,
                libsystemd-dev,
                libassuan-dev,
                libbtrfs-dev,
@@ -16,7 +15,7 @@ Build-Depends: debhelper-compat (= 13),
                python3,
                bash-completion
 Standards-Version: 4.6.2
-Homepage: https://github.com/containers/podman
+Homepage: https://github.com/podman-container-tools/podman
 
 Package: podman-docker
 Architecture: any

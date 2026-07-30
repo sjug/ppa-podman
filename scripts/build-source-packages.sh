@@ -10,7 +10,7 @@ ONLY_PKGS=()
 ONLY_FLAG=0
 BUILD_TMPDIR="$(mktemp -d)"
 
-KNOWN_PKGS=(rust-toolchain conmon crun passt netavark aardvark-dns podman podman-docker containers-common)
+KNOWN_PKGS=(go-toolchain rust-toolchain conmon crun passt netavark aardvark-dns podman podman-docker containers-common)
 trap 'rm -rf "$BUILD_TMPDIR"' EXIT
 
 RED='\033[0;31m'
@@ -75,6 +75,21 @@ apply_maintainer() {
 }
 
 info "Using maintainer: $PPA_MAINTAINER"
+
+# Ensure Go is on PATH for source builds. podman's `debian/rules clean` runs
+# `make`, which invokes `go`; the rules prepend the Launchpad path
+# /usr/lib/go-1.25/bin (absent on the build VM, which installs Go at
+# /usr/local/go/bin), so a non-interactive run would otherwise fail with
+# "go: command not found". Mirrors download-sources.sh.
+if ! command -v go >/dev/null 2>&1; then
+    if [[ -d /usr/local/go/bin ]]; then
+        export PATH="/usr/local/go/bin:$PATH"
+        info "Added /usr/local/go/bin to PATH"
+    elif [[ -d /usr/lib/go-1.25/bin ]]; then
+        export PATH="/usr/lib/go-1.25/bin:$PATH"
+        info "Added /usr/lib/go-1.25/bin to PATH"
+    fi
+fi
 
 if [[ -n "$SIGN_KEY" ]]; then
     SIGN_ARGS=("-k${SIGN_KEY}")
@@ -180,17 +195,18 @@ build_native_package() {
 info "=== Building source packages ==="
 echo
 
-# Native package used as a build dependency by Rust packages.
+# Native packages used as build dependencies by Podman/Rust packages.
+build_native_package "go-toolchain"
 build_native_package "rust-toolchain"
 
 # Quilt (upstream tarball) packages
 build_quilt_package "conmon"       "2.2.1"                          "conmon_2.2.1.orig.tar.gz"
 build_quilt_package "crun"         "1.28"                           "crun_1.28.orig.tar.gz"
-build_quilt_package "passt"        "0.0~git20260526.038c51e"        "passt_0.0~git20260526.038c51e.orig.tar.gz"
-build_quilt_package "netavark"     "1.17.2+ds"                      "netavark_1.17.2+ds.orig.tar.gz"
-build_quilt_package "aardvark-dns" "1.17.1+ds"                      "aardvark-dns_1.17.1+ds.orig.tar.gz"
-build_quilt_package "podman"       "5.8.2"                          "podman_5.8.2.orig.tar.gz"
-build_quilt_package "podman-docker" "5.8.2"                         "podman-docker_5.8.2.orig.tar.gz"
+build_quilt_package "passt"        "0.0~git20260728.f8df3f1"        "passt_0.0~git20260728.f8df3f1.orig.tar.gz"
+build_quilt_package "netavark"     "2.0.0+ds"                       "netavark_2.0.0+ds.orig.tar.gz"
+build_quilt_package "aardvark-dns" "2.0.0+ds"                       "aardvark-dns_2.0.0+ds.orig.tar.gz"
+build_quilt_package "podman"       "6.0.2"                          "podman_6.0.2.orig.tar.gz"
+build_quilt_package "podman-docker" "6.0.2"                         "podman-docker_6.0.2.orig.tar.gz"
 
 # Native package (no orig tarball)
 build_native_package "containers-common"

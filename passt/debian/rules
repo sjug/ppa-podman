@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 export DH_VERBOSE = 1
-export VERSION = 2026_05_26.038c51e
+export VERSION = 2026_07_28.f8df3f1
 
 %:
 	dh $@

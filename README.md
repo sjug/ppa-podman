@@ -1,6 +1,6 @@
-# Podman 5.8.2 PPA for Ubuntu 24.04 Noble (arm64)
+# Podman 6.0.2 PPA for Ubuntu 24.04 Noble (arm64)
 
-Launchpad PPA packaging for Podman 5.8.2 and all dependencies for full
+Launchpad PPA packaging for Podman 6.0.2 and all dependencies for full
 rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 **PPA:** [`ppa:sejug/podman`](https://launchpad.net/~sejug/+archive/ubuntu/podman)
@@ -9,35 +9,43 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 | Package | Version | Language | Purpose |
 |---|---|---|---|
-| podman | 5.8.2 | Go | Container management tool |
-| podman-docker | 5.8.2 | Shell | Docker CLI emulation via podman |
+| podman | 6.0.2 | Go | Container management tool |
+| podman-docker | 6.0.2 | Shell | Docker CLI emulation via podman |
 | conmon | 2.2.1 | C | Container runtime monitor |
 | crun | 1.28 | C | Fast OCI runtime |
-| passt | 2026_05_26 | C | Rootless networking (pasta) |
-| netavark | 1.17.2 | Rust | Container network stack |
-| aardvark-dns | 1.17.1 | Rust | Container DNS server |
-| containers-common | 1.0.0 | config | Shared config files |
-| rust-toolchain-1.86 | 1.86.0 | binary | Rust compiler for arm64 builds |
+| passt | 2026_07_28 | C | Rootless networking (pasta) |
+| netavark | 2.0.0 | Rust | Container network stack |
+| aardvark-dns | 2.0.0 | Rust | Container DNS server |
+| containers-common | common 0.68.1 | config | Shared config files |
+| go-toolchain-1.25 | 1.25.12 | binary | Go compiler for arm64 builds |
+| rust-toolchain-1.88 | 1.88.0 | binary | Rust compiler for arm64 builds |
 
 ### Design decisions
 
-- **Rust 1.86 toolchain packaged in PPA**: Ubuntu Noble ships Rust 1.75, but
-  netavark/aardvark-dns require Rust 1.86. The official Rust standalone binary
+- **Go 1.25 toolchain packaged in PPA**: Podman 6 requires Go 1.25.x, newer
+  than Noble provides. The latest Go 1.25.x standalone binary for aarch64 is
+  repackaged as a .deb.
+- **Rust 1.88 toolchain packaged in PPA**: Netavark/Aardvark 2.0.0 require
+  Rust 1.88, newer than Noble provides. The official Rust standalone binary
   for aarch64 is repackaged as a .deb.
 - **Native rootless overlays**: `storage.conf` does not set `mount_program`,
   so the kernel's native overlay driver is used. No fuse-overlayfs dependency.
 - **passt as default networking**: passt/pasta is the rootless network backend.
-  slirp4netns is not required.
-- **nftables over iptables**: netavark uses nftables by default.
+  Podman 6 removed slirp4netns support.
+- **nftables over iptables**: Podman 6 removed iptables support; netavark uses
+  nftables.
 - **AppArmor support**: podman is built with `libapparmor-dev` so AppArmor
   profiles work out of the box.
 - **NVIDIA GPU support**: podman's postinst hook auto-generates the CDI
   specification (`/etc/cdi/nvidia.yaml`) if `nvidia-ctk` is present, with
-  timestamped backups of existing configs.
+  timestamped backups of existing configs. NVIDIA Container Toolkit is expected
+  to come from NVIDIA's repositories.
+- **Podman stack focus**: this PPA packages Podman and the runtime/networking
+  stack it needs. Buildah and Skopeo are not packaged here.
 
 ### Already in Noble repos (not packaged here)
 
-`catatonit`, `uidmap`, `libgpgme`, `libseccomp`, `sqlite3`, `golang-1.24-go`
+`catatonit`, `uidmap`, `libgpgme`, `libseccomp`, `sqlite3`
 
 ## Using the PPA
 
@@ -113,8 +121,8 @@ cd vm && qemu-system-x86_64 -name ppa-builder -machine type=q35,accel=kvm \
 ```
 
 Then `ssh -p 2222 YOUR_VM_USER@localhost` to get a shell inside. See
-`CLAUDE.md` for how to create the VM from scratch, install Rust 1.86, and copy
-in the GPG signing key.
+`CLAUDE.md` for how to create the VM from scratch, install the Go/Rust
+vendoring toolchains, and copy in the GPG signing key.
 
 ### Local path and SSH hygiene
 
@@ -142,6 +150,10 @@ Note: `scp` uses uppercase `-P` for the port. `host:2222:path` is parsed as
 part of the remote path, not as the port number.
 
 ### Build steps
+
+Before vendoring Podman 6 sources, install the official x86_64 Go 1.25.x and
+Rust 1.88 toolchains in the VM. The arm64 toolchains are packaged in this PPA
+for Launchpad builds.
 
 Run these inside the VM:
 
@@ -175,6 +187,14 @@ dput ppa:YOUR_LAUNCHPAD_USER/podman crun/crun_<version>_source.changes
 workspace. Use it only in a clean tree, or upload the exact `.changes` file you
 just built with `dput` when you only want to publish one package.
 
+For major updates that introduce new build-dependency packages, upload in
+stages and wait for each stage to publish before the next one:
+
+1. `go-toolchain` and `rust-toolchain`
+2. `netavark` and `aardvark-dns`
+3. `podman` and `podman-docker`
+4. independent packages such as `passt` and `containers-common`
+
 ## Directory Structure
 
 ```
@@ -185,13 +205,13 @@ ppa-podman/
 │   ├── download-sources.sh         # Download & vendor upstream sources
 │   ├── build-source-packages.sh    # Build .dsc/.changes
 │   └── upload-ppa.sh              # Upload to Launchpad PPA
-├── podman/debian/                  # podman 5.8.2
-├── podman-docker/debian/           # podman-docker 5.8.2
+├── podman/debian/                  # podman 6.0.2
+├── podman-docker/debian/           # podman-docker 6.0.2
 ├── conmon/debian/                  # conmon 2.2.1
 ├── crun/debian/                    # crun 1.28
-├── passt/debian/                   # passt 2026_05_26
-├── netavark/debian/                # netavark 1.17.2
-├── aardvark-dns/debian/            # aardvark-dns 1.17.1
+├── passt/debian/                   # passt 2026_07_28
+├── netavark/debian/                # netavark 2.0.0
+├── aardvark-dns/debian/            # aardvark-dns 2.0.0
 ├── containers-common/              # config files + debian/
 │   ├── storage.conf
 │   ├── registries.conf
@@ -199,5 +219,6 @@ ppa-podman/
 │   ├── policy.json
 │   ├── seccomp.json
 │   └── shortnames.conf
-└── rust-toolchain/debian/          # rust 1.86.0 (arm64 binary repackage)
+├── go-toolchain/debian/            # go 1.25.x (arm64 binary repackage)
+└── rust-toolchain/debian/          # rust 1.88.0 (arm64 binary repackage)
 ```

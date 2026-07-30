@@ -17,6 +17,7 @@ vm/
 *.upload
 *.deb
 *.tar.xz
+go*.linux-*.tar.gz
 
 # Extracted source directories
 */*/vendor/

@@ -17,7 +17,7 @@ echo
 
 # Check for required tools
 MISSING=()
-for cmd in dpkg-buildpackage dput dh debuild git curl tar go cargo; do
+for cmd in dpkg-buildpackage dput dh debuild git curl tar; do
     if ! command -v "$cmd" &>/dev/null; then
         MISSING+=("$cmd")
     fi
@@ -36,11 +36,34 @@ if [[ ${#MISSING[@]} -gt 0 ]]; then
         dput \
         dpkg-dev \
         git \
-        golang-1.24-go \
         rustc
     info "Build tools installed."
 else
     info "All required tools found."
+fi
+
+echo
+
+# Check vendoring toolchains. Podman 6.0.2 requires Go 1.25.x and
+# Netavark/Aardvark 2.0.0 require Rust 1.88.x. Noble's distro toolchains are
+# too old, so install official x86_64 toolchains in the VM for vendoring.
+info "Checking vendoring toolchains..."
+if [[ -d /usr/local/go/bin ]]; then
+    export PATH="/usr/local/go/bin:$PATH"
+fi
+GO_VER=$(go version 2>/dev/null | grep -oP 'go\K\d+\.\d+\.\d+' || true)
+if [[ -z "$GO_VER" || "$GO_VER" != 1.25.* ]] || ! dpkg --compare-versions "$GO_VER" ge "1.25.12"; then
+    warn "Go version is ${GO_VER:-missing}; expected Go 1.25.12 for Podman 6.0.2."
+    warn "Install the x86_64 official Go 1.25.x tarball under /usr/local/go."
+else
+    info "Go version: $GO_VER"
+fi
+CARGO_VER=$(cargo --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' || true)
+if [[ -z "$CARGO_VER" || "$CARGO_VER" != 1.88.* ]]; then
+    warn "cargo version is ${CARGO_VER:-missing}; expected Rust/Cargo 1.88.x for Netavark/Aardvark 2.0.0."
+    warn "Install the x86_64 official Rust 1.88 standalone toolchain."
+else
+    info "cargo version: $CARGO_VER"
 fi
 
 echo

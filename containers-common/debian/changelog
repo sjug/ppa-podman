@@ -1,3 +1,36 @@
+containers-common (1.0.0+common0.68.1~noble1) noble; urgency=medium
+
+  * Sync common component configuration from container-libs common/v0.68.1
+    for Podman 6.0.2
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Wed, 29 Jul 2026 09:13:40 -0400
+
+containers-common (1.0.0+common0.68.0~noble3) noble; urgency=medium
+
+  * Sync packaged config files from upstream container-libs component tags
+  * Install upstream containers.conf/storage.conf as shared defaults under
+    /usr/share/containers and keep only PPA runtime policy in /etc/containers
+  * Remove old /etc/containers/storage.conf conffile so rootless Podman uses
+    Podman 6 storage defaults
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 30 Jun 2026 11:35:00 -0400
+
+containers-common (1.0.0+common0.68.0~noble2) noble; urgency=medium
+
+  * Ship /usr/share/containers/container-libs.version for Podman build-time
+    compatibility checks
+  * Use Podman 6 upstream default storage.conf so rootless storage defaults
+    are not masked by rootful runroot/graphroot settings
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 30 Jun 2026 09:45:00 -0400
+
+containers-common (1.0.0+common0.68.0~noble1) noble; urgency=medium
+
+  * Re-sync seccomp.json from go.podman.io/common v0.68.0 /
+    container-libs common/v0.68.0 for Podman 6.0.0
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 29 Jun 2026 00:00:00 +0000
+
 containers-common (1.0.0~noble4) noble; urgency=medium
 
   * Explicitly set network firewall_driver = "nftables" in containers.conf

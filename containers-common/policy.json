@@ -4,13 +4,11 @@
             "type": "insecureAcceptAnything"
         }
     ],
-    "transports": {
-        "docker-daemon": {
-            "": [
+    "transports":
+        {
+            "docker-daemon":
                 {
-                    "type": "insecureAcceptAnything"
+                    "": [{"type":"insecureAcceptAnything"}]
                 }
-            ]
         }
-    }
 }

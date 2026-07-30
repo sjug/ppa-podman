@@ -1,3 +1,10 @@
+aardvark-dns (2.0.0+ds-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream major release 2.0.0 for Netavark 2.0.0
+  * Built with Rust 1.88 toolchain from PPA
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 29 Jun 2026 00:00:00 +0000
+
 aardvark-dns (1.17.1+ds-1ppa1~noble1) noble; urgency=high
 
   * New upstream release 1.17.1

@@ -1,12 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
-# Download and prepare upstream source tarballs for PPA packaging
-# Each tarball is placed in its package directory as <pkg>_<ver>.orig.tar.gz
+# Download and prepare upstream source tarballs for PPA packaging.
+# Each upstream tarball is placed in its package directory as <pkg>_<ver>.orig.tar.gz.
 #
-# IMPORTANT: Rust packages (netavark, aardvark-dns) must be vendored with
-# Rust 1.86, not the system Rust. Ensure /usr/local/bin/cargo is 1.86 before
-# running this script. See CLAUDE.md for setup instructions.
+# IMPORTANT for Podman 6.0.2:
+# - Podman requires Go 1.25.6+ to vendor/build. This PPA pins the latest
+#   Go 1.25.x patch release (currently 1.25.12), so install that x86_64
+#   official toolchain in the build VM before running this script.
+# - Rust packages (netavark, aardvark-dns) require Rust 1.88 to vendor/build.
+#   Install the x86_64 official Rust 1.88 toolchain in the build VM before
+#   running this script. The PPA packages the arm64 toolchains for Launchpad.
 
 BASEDIR="$(cd "$(dirname "$0")/.." && pwd)"
 TMPDIR="$(mktemp -d)"
@@ -15,8 +19,13 @@ trap 'rm -rf "$TMPDIR"' EXIT
 ONLY_PKGS=()
 ONLY_FLAG=0
 
-KNOWN_PKGS=(conmon crun passt netavark aardvark-dns podman podman-docker rust-toolchain containers-common)
-RUST_TOOLCHAIN_SHA256="2b97d1e09a1d7fdbed748332879318ee7f41c008837f87ccb44ec045df0a8a1b"
+KNOWN_PKGS=(go-toolchain rust-toolchain conmon crun passt netavark aardvark-dns podman podman-docker containers-common)
+GO_TOOLCHAIN_SHA256="8b5884aef89600aef5b0b051fb971f11f49bb996521e911f30f02a66884f7bd2"
+RUST_TOOLCHAIN_SHA256="d5decc46123eb888f809f2ee3b118d13586a37ffad38afaefe56aa7139481d34"
+CONTAINER_COMMON_VERSION="0.68.1"
+CONTAINER_STORAGE_VERSION="1.63.0"
+CONTAINER_IMAGE_VERSION="5.40.0"
+CONTAINER_SHORTNAMES_VERSION="2025.03.19"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -70,24 +79,62 @@ should_download() {
     return 1
 }
 
-# Ensure Go is in PATH (Noble installs to /usr/lib/go-1.24/bin/)
-if ! command -v go >/dev/null 2>&1; then
-    if [[ -d /usr/lib/go-1.24/bin ]]; then
-        export PATH="/usr/lib/go-1.24/bin:$PATH"
-        info "Added /usr/lib/go-1.24/bin to PATH"
-    else
-        error "Go not found. Install golang-1.24-go."
+version_ge() {
+    dpkg --compare-versions "$1" ge "$2"
+}
+
+download_checked() {
+    local url="$1"
+    local dest="$2"
+    local sha256="$3"
+    curl -fsSL -o "$dest" "$url"
+    printf '%s  %s\n' "$sha256" "$dest" | sha256sum -c - >/dev/null
+}
+
+# Ensure the latest Go 1.25.x is in PATH when Podman vendoring is requested.
+if should_download "podman" || should_download "podman-docker"; then
+    if [[ -d /usr/local/go/bin ]]; then
+        export PATH="/usr/local/go/bin:$PATH"
+        info "Added /usr/local/go/bin to PATH"
+    elif [[ -d /usr/lib/go-1.25/bin ]]; then
+        export PATH="/usr/lib/go-1.25/bin:$PATH"
+        info "Added /usr/lib/go-1.25/bin to PATH"
+    fi
+    if ! command -v go >/dev/null 2>&1; then
+        error "Go not found. Install Go 1.25.12 in the build VM."
+        exit 1
+    fi
+    GO_VER=$(go version 2>/dev/null | grep -oP 'go\K\d+\.\d+\.\d+' || echo "none")
+    if [[ "$GO_VER" == "none" ]] || [[ "$GO_VER" != 1.25.* ]] || ! version_ge "$GO_VER" "1.25.12"; then
+        error "go version is $GO_VER, expected latest Go 1.25.x (currently 1.25.12) for Podman 6.0.2"
+        error "Install the x86_64 official Go 1.25.12 toolchain in the build VM."
         exit 1
     fi
 fi
 
-# Verify Rust version for vendoring
-CARGO_VER=$(cargo --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' || echo "none")
-if [[ "$CARGO_VER" != 1.86.* ]]; then
-    warn "cargo version is $CARGO_VER, expected 1.86.x"
-    warn "Rust packages may fail to build if vendored with wrong version"
-    warn "See CLAUDE.md for Rust 1.86 setup instructions"
+# Verify Rust version when Rust vendoring is requested.
+if should_download "netavark" || should_download "aardvark-dns"; then
+    CARGO_VER=$(cargo --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' || echo "none")
+    if [[ "$CARGO_VER" == "none" ]] || ! version_ge "$CARGO_VER" "1.88.0"; then
+        warn "cargo version is $CARGO_VER, expected 1.88.x or newer"
+        warn "Rust packages may fail to build if vendored with the wrong version"
+        warn "See CLAUDE.md for Rust setup instructions"
+    fi
 fi
+
+# ---------- go-toolchain 1.25.12 (aarch64 standalone binary) ----------
+pkg_go_toolchain() {
+    info "Downloading Go 1.25.12 standalone for arm64..."
+    cd "$TMPDIR"
+    curl -sSL -o go1.25.12.linux-arm64.tar.gz \
+        "https://go.dev/dl/go1.25.12.linux-arm64.tar.gz"
+    printf '%s  %s\n' \
+        "$GO_TOOLCHAIN_SHA256" \
+        "go1.25.12.linux-arm64.tar.gz" | sha256sum -c -
+    rm -f "$BASEDIR/go-toolchain"/go1.25.*.linux-arm64.tar.gz
+    cp go1.25.12.linux-arm64.tar.gz "$BASEDIR/go-toolchain/"
+    info "go-toolchain done."
+}
 
 # ---------- conmon 2.2.1 ----------
 pkg_conmon() {
@@ -111,19 +158,19 @@ pkg_crun() {
 
 # ---------- passt ----------
 pkg_passt() {
-    info "Downloading passt 2026_05_26.038c51e..."
+    info "Downloading passt 2026_07_28.f8df3f1..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch 2026_05_26.038c51e \
-        https://passt.top/passt passt-0.0~git20260526.038c51e
-    rm -rf passt-0.0~git20260526.038c51e/.git
-    tar czf passt_0.0~git20260526.038c51e.orig.tar.gz passt-0.0~git20260526.038c51e/
-    cp passt_0.0~git20260526.038c51e.orig.tar.gz "$BASEDIR/passt/"
+    git clone --depth 1 --branch 2026_07_28.f8df3f1 \
+        https://passt.top/passt passt-0.0~git20260728.f8df3f1
+    rm -rf passt-0.0~git20260728.f8df3f1/.git
+    tar czf passt_0.0~git20260728.f8df3f1.orig.tar.gz passt-0.0~git20260728.f8df3f1/
+    cp passt_0.0~git20260728.f8df3f1.orig.tar.gz "$BASEDIR/passt/"
     info "passt done."
 }
 
-# ---------- netavark 1.17.2 (with vendored Rust deps) ----------
+# ---------- netavark 2.0.0 (with vendored Rust deps) ----------
 pkg_netavark() {
-    local ver="1.17.2"
+    local ver="2.0.0"
     local dsver="${ver}+ds"
     info "Downloading netavark ${ver} and vendoring Rust deps..."
     cd "$TMPDIR"
@@ -146,9 +193,9 @@ TOML
     info "netavark done."
 }
 
-# ---------- aardvark-dns 1.17.1 (with vendored Rust deps) ----------
+# ---------- aardvark-dns 2.0.0 (with vendored Rust deps) ----------
 pkg_aardvark() {
-    local ver="1.17.1"
+    local ver="2.0.0"
     local dsver="${ver}+ds"
     info "Downloading aardvark-dns ${ver} and vendoring Rust deps..."
     cd "$TMPDIR"
@@ -171,38 +218,74 @@ TOML
     info "aardvark-dns done."
 }
 
-# ---------- podman 5.8.2 (with vendored Go deps) ----------
+# ---------- podman 6.0.2 (with vendored Go deps) ----------
 pkg_podman() {
-    info "Downloading podman 5.8.2 and vendoring Go deps..."
+    info "Downloading podman 6.0.2 and vendoring Go deps..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch v5.8.2 \
-        https://github.com/containers/podman.git podman-5.8.2
-    cd podman-5.8.2
+    git clone --depth 1 --branch v6.0.2 \
+        https://github.com/podman-container-tools/podman.git podman-6.0.2
+    cd podman-6.0.2
     go mod vendor
     rm -rf .git
     cd "$TMPDIR"
-    tar czf podman_5.8.2.orig.tar.gz podman-5.8.2/
-    cp podman_5.8.2.orig.tar.gz "$BASEDIR/podman/"
-    cp podman_5.8.2.orig.tar.gz "$BASEDIR/podman-docker/podman-docker_5.8.2.orig.tar.gz"
+    tar czf podman_6.0.2.orig.tar.gz podman-6.0.2/
+    cp podman_6.0.2.orig.tar.gz "$BASEDIR/podman/"
+    cp podman_6.0.2.orig.tar.gz "$BASEDIR/podman-docker/podman-docker_6.0.2.orig.tar.gz"
     info "podman done."
 }
 
-# ---------- rust-toolchain 1.86.0 (aarch64 standalone binary) ----------
+# ---------- rust-toolchain 1.88.0 (aarch64 standalone binary) ----------
 pkg_rust_toolchain() {
-    info "Downloading Rust 1.86.0 standalone for aarch64..."
+    info "Downloading Rust 1.88.0 standalone for aarch64..."
     cd "$TMPDIR"
-    curl -sSL -o rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz \
-        "https://static.rust-lang.org/dist/rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz"
+    curl -sSL -o rust-1.88.0-aarch64-unknown-linux-gnu.tar.xz \
+        "https://static.rust-lang.org/dist/rust-1.88.0-aarch64-unknown-linux-gnu.tar.xz"
     printf '%s  %s\n' \
         "$RUST_TOOLCHAIN_SHA256" \
-        "rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz" | sha256sum -c -
-    cp rust-1.86.0-aarch64-unknown-linux-gnu.tar.xz "$BASEDIR/rust-toolchain/rust-1.86.0-aarch64.tar.xz"
+        "rust-1.88.0-aarch64-unknown-linux-gnu.tar.xz" | sha256sum -c -
+    cp rust-1.88.0-aarch64-unknown-linux-gnu.tar.xz "$BASEDIR/rust-toolchain/rust-1.88.0-aarch64.tar.xz"
     info "rust-toolchain done."
 }
 
-# ---------- containers-common (no download needed) ----------
+# ---------- containers-common configuration from upstream component tags ----------
 pkg_containers_common() {
-    info "containers-common is a native package, no upstream tarball needed."
+    info "Downloading containers-common config files from upstream tags..."
+    cd "$TMPDIR"
+
+    local base="https://raw.githubusercontent.com/podman-container-tools/container-libs"
+    download_checked \
+        "$base/common/v${CONTAINER_COMMON_VERSION}/common/pkg/config/containers.conf" \
+        containers.conf \
+        "52f22279adebcaef46fe95ce4ebed87794ae21c75b31c85fca16b7f345b002b3"
+    download_checked \
+        "$base/common/v${CONTAINER_COMMON_VERSION}/common/pkg/seccomp/seccomp.json" \
+        seccomp.json \
+        "9b755202516aee4b45d9d411ab800c20fe4f7af97166a93b7f07d5b16c1a4ecd"
+    download_checked \
+        "$base/storage/v${CONTAINER_STORAGE_VERSION}/storage/storage.conf" \
+        storage.conf \
+        "322dffd5a543bb9e1ca9c67cc56999c62b746118674d004180fe60dddfc21979"
+    download_checked \
+        "$base/image/v${CONTAINER_IMAGE_VERSION}/image/registries.conf" \
+        registries.conf \
+        "517b917ff7ad391d20ca3850ca80f3da5be102bbb3267cc3c9875909178bd6de"
+    download_checked \
+        "$base/image/v${CONTAINER_IMAGE_VERSION}/image/default-policy.json" \
+        policy.json \
+        "cddfaa8e6a7e5497b67cc0dd8e8517058d0c97de91bf46fff867528415f2d946"
+    download_checked \
+        "$base/image/v${CONTAINER_IMAGE_VERSION}/image/default.yaml" \
+        default.yaml \
+        "370f4cd92207c958346363b35df4f81bf5a84e4ef5b3f97a7990595ac0e04297"
+    download_checked \
+        "https://raw.githubusercontent.com/containers/shortnames/v${CONTAINER_SHORTNAMES_VERSION}/shortnames.conf" \
+        shortnames.conf \
+        "14a40c93c2d7cea9c0b28c69b0ba01ef1d232add9be9803691280d2f9dc018d3"
+
+    cp containers.conf seccomp.json storage.conf registries.conf policy.json default.yaml shortnames.conf \
+        "$BASEDIR/containers-common/"
+    printf '%s\n' "$CONTAINER_COMMON_VERSION" > "$BASEDIR/containers-common/container-libs.version"
+    info "containers-common config files synced from container-libs common v${CONTAINER_COMMON_VERSION}, storage v${CONTAINER_STORAGE_VERSION}, image v${CONTAINER_IMAGE_VERSION}, shortnames v${CONTAINER_SHORTNAMES_VERSION}."
 }
 
 if [[ ${#ONLY_PKGS[@]} -gt 0 ]]; then
@@ -213,18 +296,21 @@ fi
 info "Working in: $TMPDIR"
 echo
 
-should_download "conmon"            && pkg_conmon
-should_download "crun"              && pkg_crun
-should_download "passt"             && pkg_passt
-should_download "netavark"          && pkg_netavark
-should_download "aardvark-dns"      && pkg_aardvark
-# pkg_podman produces the tarball used by both podman and podman-docker
+should_download "go-toolchain"       && pkg_go_toolchain
+should_download "conmon"             && pkg_conmon
+should_download "crun"               && pkg_crun
+should_download "passt"              && pkg_passt
+should_download "netavark"           && pkg_netavark
+should_download "aardvark-dns"       && pkg_aardvark
+# pkg_podman produces the tarball used by both podman and podman-docker.
 if should_download "podman" || should_download "podman-docker"; then
     pkg_podman
 fi
-should_download "rust-toolchain"    && pkg_rust_toolchain
-should_download "containers-common" && pkg_containers_common
+should_download "rust-toolchain"     && pkg_rust_toolchain
+should_download "containers-common"  && pkg_containers_common
 
 echo
 info "=== All source tarballs ready ==="
-ls -lh "$BASEDIR"/*/*.orig.tar.gz "$BASEDIR"/rust-toolchain/*.tar.xz 2>/dev/null || true
+ls -lh "$BASEDIR"/*/*.orig.tar.gz \
+       "$BASEDIR"/go-toolchain/*.tar.gz \
+       "$BASEDIR"/rust-toolchain/*.tar.xz 2>/dev/null || true

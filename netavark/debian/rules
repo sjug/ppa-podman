@@ -2,7 +2,7 @@
 
 export DH_VERBOSE = 1
 export CARGO_HOME = $(CURDIR)/debian/cargo_home
-export PATH := /usr/lib/rust-1.86/bin:$(PATH)
+export PATH := /usr/lib/rust-1.88/bin:$(PATH)
 
 %:
 	dh $@

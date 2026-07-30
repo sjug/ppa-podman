@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
 
 export DH_VERBOSE = 1
-RUSTDIR = /usr/lib/rust-1.86
-INSTALL_ROOT = $(CURDIR)/debian/rust-toolchain-1.86$(RUSTDIR)
+RUSTDIR = /usr/lib/rust-1.88
+INSTALL_ROOT = $(CURDIR)/debian/rust-toolchain-1.88$(RUSTDIR)
 
 %:
 	dh $@
@@ -12,13 +12,13 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	mkdir -p $(INSTALL_ROOT)
-	tar xf rust-1.86.0-aarch64.tar.xz
-	cd rust-1.86.0-aarch64-unknown-linux-gnu && \
-		./install.sh --destdir=$(CURDIR)/debian/rust-toolchain-1.86 --prefix=$(RUSTDIR) --disable-ldconfig
+	tar xf rust-1.88.0-aarch64.tar.xz
+	cd rust-1.88.0-aarch64-unknown-linux-gnu && \
+		./install.sh --destdir=$(CURDIR)/debian/rust-toolchain-1.88 --prefix=$(RUSTDIR) --disable-ldconfig
 	# Create convenience symlinks in the bin dir
-	mkdir -p $(CURDIR)/debian/rust-toolchain-1.86/usr/bin
-	ln -sf ../lib/rust-1.86/bin/rustc $(CURDIR)/debian/rust-toolchain-1.86/usr/bin/rustc-1.86
-	ln -sf ../lib/rust-1.86/bin/cargo $(CURDIR)/debian/rust-toolchain-1.86/usr/bin/cargo-1.86
+	mkdir -p $(CURDIR)/debian/rust-toolchain-1.88/usr/bin
+	ln -sf ../lib/rust-1.88/bin/rustc $(CURDIR)/debian/rust-toolchain-1.88/usr/bin/rustc-1.88
+	ln -sf ../lib/rust-1.88/bin/cargo $(CURDIR)/debian/rust-toolchain-1.88/usr/bin/cargo-1.88
 
 override_dh_auto_test:
 	# No tests

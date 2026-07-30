@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+GODIR = /usr/lib/go-1.25
+INSTALL_ROOT = $(CURDIR)/debian/go-toolchain-1.25$(GODIR)
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Nothing to compile — repackaging official binaries
+
+override_dh_auto_install:
+	mkdir -p $(INSTALL_ROOT)
+	tar xzf go1.25.12.linux-arm64.tar.gz
+	cp -a go/. $(INSTALL_ROOT)/
+	# Create convenience symlinks in the bin dir
+	mkdir -p $(CURDIR)/debian/go-toolchain-1.25/usr/bin
+	ln -sf ../lib/go-1.25/bin/go $(CURDIR)/debian/go-toolchain-1.25/usr/bin/go-1.25
+	ln -sf ../lib/go-1.25/bin/gofmt $(CURDIR)/debian/go-toolchain-1.25/usr/bin/gofmt-1.25
+
+override_dh_auto_test:
+	# No tests
+
+override_dh_strip_nondeterminism:
+	# Go source tree includes intentionally malformed zip testdata
+
+override_dh_dwz:
+	# Pre-built binaries have incompatible debug info
+
+override_dh_strip:
+	# Do not strip pre-built binaries
+
+override_dh_shlibdeps:
+	# Go source tree includes cross-architecture ELF testdata that shlibdeps treats as binaries
