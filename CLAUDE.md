@@ -195,7 +195,7 @@ dput ppa:YOUR_LAUNCHPAD_USER/podman crun/crun_<version>_source.changes
 
 ## Critical gotchas learned from building this PPA
 
-- **Vendoring must use the target toolchain versions.** Noble has older Go/Rust toolchains; Podman 6 needs Go 1.25.x and Netavark/Aardvark 2.0.0 need Rust 1.88.x. Install official x86_64 Go/Rust toolchains on the build VM before running `go mod vendor` or `cargo vendor`.
+- **Vendoring must use the target toolchain versions.** Noble has older Go/Rust toolchains; Podman 6 needs Go 1.25.x and Netavark/Aardvark 2.1.0 need Rust 1.88.x. Install official x86_64 Go/Rust toolchains on the build VM before running `go mod vendor` or `cargo vendor`.
 
 - **Launchpad rejects re-uploads of orig tarballs with the same filename but different contents.** If you re-vendor and need a new orig tarball, change the upstream version string (e.g., append `+ds` suffix: `netavark_2.0.0+ds.orig.tar.gz`).
 

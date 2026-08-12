@@ -1,3 +1,10 @@
+netavark (2.1.0+ds-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 2.1.0 (Podman 6.0.x compatible, MSRV Rust 1.88)
+  * Built with Rust 1.88 toolchain from PPA
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 11 Aug 2026 16:19:08 -0400
+
 netavark (2.0.0+ds-1ppa1~noble1) noble; urgency=medium
 
   * New upstream major release 2.0.0 for Podman 6.0.0

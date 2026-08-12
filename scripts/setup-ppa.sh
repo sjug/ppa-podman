@@ -45,7 +45,7 @@ fi
 echo
 
 # Check vendoring toolchains. Podman 6.0.2 requires Go 1.25.x and
-# Netavark/Aardvark 2.0.0 require Rust 1.88.x. Noble's distro toolchains are
+# Netavark/Aardvark 2.1.0 require Rust 1.88.x. Noble's distro toolchains are
 # too old, so install official x86_64 toolchains in the VM for vendoring.
 info "Checking vendoring toolchains..."
 if [[ -d /usr/local/go/bin ]]; then
@@ -60,7 +60,7 @@ else
 fi
 CARGO_VER=$(cargo --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' || true)
 if [[ -z "$CARGO_VER" || "$CARGO_VER" != 1.88.* ]]; then
-    warn "cargo version is ${CARGO_VER:-missing}; expected Rust/Cargo 1.88.x for Netavark/Aardvark 2.0.0."
+    warn "cargo version is ${CARGO_VER:-missing}; expected Rust/Cargo 1.88.x for Netavark/Aardvark 2.1.0."
     warn "Install the x86_64 official Rust 1.88 standalone toolchain."
 else
     info "cargo version: $CARGO_VER"

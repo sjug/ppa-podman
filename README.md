@@ -12,10 +12,10 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 | podman | 6.0.2 | Go | Container management tool |
 | podman-docker | 6.0.2 | Shell | Docker CLI emulation via podman |
 | conmon | 2.2.1 | C | Container runtime monitor |
-| crun | 1.28 | C | Fast OCI runtime |
+| crun | 1.29 | C | Fast OCI runtime |
 | passt | 2026_07_28 | C | Rootless networking (pasta) |
-| netavark | 2.0.0 | Rust | Container network stack |
-| aardvark-dns | 2.0.0 | Rust | Container DNS server |
+| netavark | 2.1.0 | Rust | Container network stack |
+| aardvark-dns | 2.1.0 | Rust | Container DNS server |
 | containers-common | common 0.68.1 | config | Shared config files |
 | go-toolchain-1.25 | 1.25.12 | binary | Go compiler for arm64 builds |
 | rust-toolchain-1.88 | 1.88.0 | binary | Rust compiler for arm64 builds |
@@ -25,7 +25,7 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 - **Go 1.25 toolchain packaged in PPA**: Podman 6 requires Go 1.25.x, newer
   than Noble provides. The latest Go 1.25.x standalone binary for aarch64 is
   repackaged as a .deb.
-- **Rust 1.88 toolchain packaged in PPA**: Netavark/Aardvark 2.0.0 require
+- **Rust 1.88 toolchain packaged in PPA**: Netavark/Aardvark 2.1.0 require
   Rust 1.88, newer than Noble provides. The official Rust standalone binary
   for aarch64 is repackaged as a .deb.
 - **Native rootless overlays**: `storage.conf` does not set `mount_program`,
@@ -208,10 +208,10 @@ ppa-podman/
 ├── podman/debian/                  # podman 6.0.2
 ├── podman-docker/debian/           # podman-docker 6.0.2
 ├── conmon/debian/                  # conmon 2.2.1
-├── crun/debian/                    # crun 1.28
+├── crun/debian/                    # crun 1.29
 ├── passt/debian/                   # passt 2026_07_28
-├── netavark/debian/                # netavark 2.0.0
-├── aardvark-dns/debian/            # aardvark-dns 2.0.0
+├── netavark/debian/                # netavark 2.1.0
+├── aardvark-dns/debian/            # aardvark-dns 2.1.0
 ├── containers-common/              # config files + debian/
 │   ├── storage.conf
 │   ├── registries.conf

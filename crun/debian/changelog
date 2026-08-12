@@ -1,3 +1,10 @@
+crun (1.29-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 1.29
+  * Restores OCI hooks JSON formatting broken by the 1.28 yajl->json-c switch
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Tue, 11 Aug 2026 16:19:08 -0400
+
 crun (1.28-1ppa2~noble1) noble; urgency=medium
 
   * Build-Depend on libjson-c-dev instead of libyajl-dev: crun 1.28 migrated
