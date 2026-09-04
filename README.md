@@ -1,6 +1,6 @@
-# Podman 6.0.2 PPA for Ubuntu 24.04 Noble (arm64)
+# Podman 6.1.1 PPA for Ubuntu 24.04 Noble (arm64)
 
-Launchpad PPA packaging for Podman 6.0.2 and all dependencies for full
+Launchpad PPA packaging for Podman 6.1.1 and all dependencies for full
 rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 **PPA:** [`ppa:sejug/podman`](https://launchpad.net/~sejug/+archive/ubuntu/podman)
@@ -9,15 +9,15 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 | Package | Version | Language | Purpose |
 |---|---|---|---|
-| podman | 6.0.2 | Go | Container management tool |
-| podman-docker | 6.0.2 | Shell | Docker CLI emulation via podman |
+| podman | 6.1.1 | Go | Container management tool |
+| podman-docker | 6.1.1 | Shell | Docker CLI emulation via podman |
 | conmon | 2.2.1 | C | Container runtime monitor |
-| crun | 1.29 | C | Fast OCI runtime |
+| crun | 1.29.1 | C | Fast OCI runtime |
 | passt | 2026_07_28 | C | Rootless networking (pasta) |
 | netavark | 2.1.0 | Rust | Container network stack |
 | aardvark-dns | 2.1.0 | Rust | Container DNS server |
-| containers-common | common 0.68.1 | config | Shared config files |
-| go-toolchain-1.25 | 1.25.12 | binary | Go compiler for arm64 builds |
+| containers-common | common 0.69.1 | config | Shared config files |
+| go-toolchain-1.25 | 1.25.14 | binary | Go compiler for arm64 builds |
 | rust-toolchain-1.88 | 1.88.0 | binary | Rust compiler for arm64 builds |
 
 ### Design decisions
@@ -205,10 +205,10 @@ ppa-podman/
 │   ├── download-sources.sh         # Download & vendor upstream sources
 │   ├── build-source-packages.sh    # Build .dsc/.changes
 │   └── upload-ppa.sh              # Upload to Launchpad PPA
-├── podman/debian/                  # podman 6.0.2
-├── podman-docker/debian/           # podman-docker 6.0.2
+├── podman/debian/                  # podman 6.1.1
+├── podman-docker/debian/           # podman-docker 6.1.1
 ├── conmon/debian/                  # conmon 2.2.1
-├── crun/debian/                    # crun 1.29
+├── crun/debian/                    # crun 1.29.1
 ├── passt/debian/                   # passt 2026_07_28
 ├── netavark/debian/                # netavark 2.1.0
 ├── aardvark-dns/debian/            # aardvark-dns 2.1.0

@@ -4,9 +4,9 @@ set -euo pipefail
 # Download and prepare upstream source tarballs for PPA packaging.
 # Each upstream tarball is placed in its package directory as <pkg>_<ver>.orig.tar.gz.
 #
-# IMPORTANT for Podman 6.0.2:
-# - Podman requires Go 1.25.6+ to vendor/build. This PPA pins the latest
-#   Go 1.25.x patch release (currently 1.25.12), so install that x86_64
+# IMPORTANT for Podman 6.1.1:
+# - Podman requires Go 1.25.9+ to vendor/build. This PPA pins the latest
+#   Go 1.25.x patch release (currently 1.25.14), so install that x86_64
 #   official toolchain in the build VM before running this script.
 # - Rust packages (netavark, aardvark-dns) require Rust 1.88 to vendor/build.
 #   Install the x86_64 official Rust 1.88 toolchain in the build VM before
@@ -20,11 +20,11 @@ ONLY_PKGS=()
 ONLY_FLAG=0
 
 KNOWN_PKGS=(go-toolchain rust-toolchain conmon crun passt netavark aardvark-dns podman podman-docker containers-common)
-GO_TOOLCHAIN_SHA256="8b5884aef89600aef5b0b051fb971f11f49bb996521e911f30f02a66884f7bd2"
+GO_TOOLCHAIN_SHA256="9bf234ea70ffec9347fdf6b22ce4add51717d3386a38a441e8c8743fceb5eaee"
 RUST_TOOLCHAIN_SHA256="d5decc46123eb888f809f2ee3b118d13586a37ffad38afaefe56aa7139481d34"
-CONTAINER_COMMON_VERSION="0.68.1"
-CONTAINER_STORAGE_VERSION="1.63.0"
-CONTAINER_IMAGE_VERSION="5.40.0"
+CONTAINER_COMMON_VERSION="0.69.1"
+CONTAINER_STORAGE_VERSION="1.64.0"
+CONTAINER_IMAGE_VERSION="5.41.1"
 CONTAINER_SHORTNAMES_VERSION="2025.03.19"
 
 RED='\033[0;31m'
@@ -101,13 +101,13 @@ if should_download "podman" || should_download "podman-docker"; then
         info "Added /usr/lib/go-1.25/bin to PATH"
     fi
     if ! command -v go >/dev/null 2>&1; then
-        error "Go not found. Install Go 1.25.12 in the build VM."
+        error "Go not found. Install Go 1.25.14 in the build VM."
         exit 1
     fi
     GO_VER=$(go version 2>/dev/null | grep -oP 'go\K\d+\.\d+\.\d+' || echo "none")
-    if [[ "$GO_VER" == "none" ]] || [[ "$GO_VER" != 1.25.* ]] || ! version_ge "$GO_VER" "1.25.12"; then
-        error "go version is $GO_VER, expected latest Go 1.25.x (currently 1.25.12) for Podman 6.0.2"
-        error "Install the x86_64 official Go 1.25.12 toolchain in the build VM."
+    if [[ "$GO_VER" == "none" ]] || [[ "$GO_VER" != 1.25.* ]] || ! version_ge "$GO_VER" "1.25.14"; then
+        error "go version is $GO_VER, expected latest Go 1.25.x (currently 1.25.14) for Podman 6.1.1"
+        error "Install the x86_64 official Go 1.25.14 toolchain in the build VM."
         exit 1
     fi
 fi
@@ -122,17 +122,17 @@ if should_download "netavark" || should_download "aardvark-dns"; then
     fi
 fi
 
-# ---------- go-toolchain 1.25.12 (aarch64 standalone binary) ----------
+# ---------- go-toolchain 1.25.14 (aarch64 standalone binary) ----------
 pkg_go_toolchain() {
-    info "Downloading Go 1.25.12 standalone for arm64..."
+    info "Downloading Go 1.25.14 standalone for arm64..."
     cd "$TMPDIR"
-    curl -sSL -o go1.25.12.linux-arm64.tar.gz \
-        "https://go.dev/dl/go1.25.12.linux-arm64.tar.gz"
+    curl -sSL -o go1.25.14.linux-arm64.tar.gz \
+        "https://go.dev/dl/go1.25.14.linux-arm64.tar.gz"
     printf '%s  %s\n' \
         "$GO_TOOLCHAIN_SHA256" \
-        "go1.25.12.linux-arm64.tar.gz" | sha256sum -c -
+        "go1.25.14.linux-arm64.tar.gz" | sha256sum -c -
     rm -f "$BASEDIR/go-toolchain"/go1.25.*.linux-arm64.tar.gz
-    cp go1.25.12.linux-arm64.tar.gz "$BASEDIR/go-toolchain/"
+    cp go1.25.14.linux-arm64.tar.gz "$BASEDIR/go-toolchain/"
     info "go-toolchain done."
 }
 
@@ -146,13 +146,13 @@ pkg_conmon() {
     info "conmon done."
 }
 
-# ---------- crun 1.29 ----------
+# ---------- crun 1.29.1 ----------
 pkg_crun() {
-    info "Downloading crun 1.29..."
+    info "Downloading crun 1.29.1..."
     cd "$TMPDIR"
-    curl -sSL -o crun-1.29.tar.gz \
-        "https://github.com/containers/crun/releases/download/1.29/crun-1.29.tar.gz"
-    cp crun-1.29.tar.gz "$BASEDIR/crun/crun_1.29.orig.tar.gz"
+    curl -sSL -o crun-1.29.1.tar.gz \
+        "https://github.com/containers/crun/releases/download/1.29.1/crun-1.29.1.tar.gz"
+    cp crun-1.29.1.tar.gz "$BASEDIR/crun/crun_1.29.1.orig.tar.gz"
     info "crun done."
 }
 
@@ -218,19 +218,19 @@ TOML
     info "aardvark-dns done."
 }
 
-# ---------- podman 6.0.2 (with vendored Go deps) ----------
+# ---------- podman 6.1.1 (with vendored Go deps) ----------
 pkg_podman() {
-    info "Downloading podman 6.0.2 and vendoring Go deps..."
+    info "Downloading podman 6.1.1 and vendoring Go deps..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch v6.0.2 \
-        https://github.com/podman-container-tools/podman.git podman-6.0.2
-    cd podman-6.0.2
+    git clone --depth 1 --branch v6.1.1 \
+        https://github.com/podman-container-tools/podman.git podman-6.1.1
+    cd podman-6.1.1
     go mod vendor
     rm -rf .git
     cd "$TMPDIR"
-    tar czf podman_6.0.2.orig.tar.gz podman-6.0.2/
-    cp podman_6.0.2.orig.tar.gz "$BASEDIR/podman/"
-    cp podman_6.0.2.orig.tar.gz "$BASEDIR/podman-docker/podman-docker_6.0.2.orig.tar.gz"
+    tar czf podman_6.1.1.orig.tar.gz podman-6.1.1/
+    cp podman_6.1.1.orig.tar.gz "$BASEDIR/podman/"
+    cp podman_6.1.1.orig.tar.gz "$BASEDIR/podman-docker/podman-docker_6.1.1.orig.tar.gz"
     info "podman done."
 }
 
@@ -256,7 +256,7 @@ pkg_containers_common() {
     download_checked \
         "$base/common/v${CONTAINER_COMMON_VERSION}/common/pkg/config/containers.conf" \
         containers.conf \
-        "52f22279adebcaef46fe95ce4ebed87794ae21c75b31c85fca16b7f345b002b3"
+        "0dc1c6cc0c41d1cb1ac63154c328cbcbe6ff4666f21f4795d7d12c506db41650"
     download_checked \
         "$base/common/v${CONTAINER_COMMON_VERSION}/common/pkg/seccomp/seccomp.json" \
         seccomp.json \

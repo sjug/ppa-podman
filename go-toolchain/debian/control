@@ -10,8 +10,8 @@ Package: go-toolchain-1.25
 Architecture: arm64
 Depends: ${misc:Depends}, libc6
 Provides: go-compiler
-Description: Go 1.25.12 toolchain for arm64 (binary repackage)
- Official Go 1.25.12 compiler toolchain repackaged as a .deb for
+Description: Go 1.25.14 toolchain for arm64 (binary repackage)
+ Official Go 1.25.14 compiler toolchain repackaged as a .deb for
  arm64/aarch64. Installs to /usr/lib/go-1.25/ and provides go and
  gofmt convenience symlinks with a -1.25 suffix. Does not conflict
  with the system Go toolchain.

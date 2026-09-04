@@ -143,7 +143,7 @@ ssh-keygen -R '[localhost]:2222'
 
 The VM's distro toolchains are too old for Podman 6. Install official x86_64
 standalone toolchains on the VM before running `download-sources.sh`. Use the
-latest Go 1.25.x patch release (currently 1.25.12) and Rust 1.88.x to match the
+latest Go 1.25.x patch release (currently 1.25.14) and Rust 1.88.x to match the
 Launchpad arm64 toolchain packages.
 
 ```bash
@@ -151,7 +151,7 @@ ssh -p 2222 YOUR_VM_USER@localhost
 
 # Go 1.25.x
 sudo rm -rf /usr/local/go
-curl -sSL "https://go.dev/dl/go1.25.12.linux-amd64.tar.gz" | sudo tar -C /usr/local -xz
+curl -sSL "https://go.dev/dl/go1.25.14.linux-amd64.tar.gz" | sudo tar -C /usr/local -xz
 
 # Rust 1.88
 curl -sSL "https://static.rust-lang.org/dist/rust-1.88.0-x86_64-unknown-linux-gnu.tar.xz" | tar xJ
@@ -229,10 +229,10 @@ To re-upload a package with packaging changes only (no upstream version change),
 
 ## Upgrading to a new upstream version
 
-When a new upstream release comes out (e.g., podman 6.0.2):
+When a new upstream release comes out (e.g., podman 6.1.1):
 
 1. **Update `scripts/download-sources.sh`** — change the version in the relevant `pkg_*()` function
-2. **Update `debian/changelog`** — prepend a new version entry (e.g., `6.0.2-1ppa1~noble1`). Do NOT replace old entries — they are history.
+2. **Update `debian/changelog`** — prepend a new version entry (e.g., `6.1.1-1ppa1~noble1`). Do NOT replace old entries — they are history.
 3. **Update `scripts/build-source-packages.sh`** — change the version/tarball in the `build_quilt_package` line
 4. **Update `debian/control`** if build deps changed upstream (check Arch PKGBUILD diff for hints)
 5. **Update `README.md`** — version table, title, description, directory tree

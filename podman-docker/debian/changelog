@@ -1,3 +1,9 @@
+podman-docker (6.1.1-1ppa1~noble1) noble; urgency=medium
+
+  * Docker CLI emulation using Podman 6.1.1
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Fri, 04 Sep 2026 10:13:57 -0400
+
 podman-docker (6.0.2-1ppa1~noble1) noble; urgency=medium
 
   * Docker CLI emulation using Podman 6.0.2

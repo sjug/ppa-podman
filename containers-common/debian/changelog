@@ -1,3 +1,11 @@
+containers-common (1.0.0+common0.69.1~noble1) noble; urgency=medium
+
+  * Sync common component configuration from container-libs common/v0.69.1
+    for Podman 6.1.1 (storage v1.64.0, image v5.41.1)
+  * Only containers.conf changed; other config payloads byte-identical
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Fri, 04 Sep 2026 10:13:57 -0400
+
 containers-common (1.0.0+common0.68.1~noble1) noble; urgency=medium
 
   * Sync common component configuration from container-libs common/v0.68.1

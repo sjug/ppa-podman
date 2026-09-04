@@ -1,3 +1,12 @@
+podman (6.1.1-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 6.1.1 (fixes CVE-2026-17106: archive extraction
+    outside the intended directory)
+  * Build against container-libs/common v0.69.1
+  * Build with Go 1.25.14 toolchain from PPA
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Fri, 04 Sep 2026 10:13:57 -0400
+
 podman (6.0.2-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 6.0.2

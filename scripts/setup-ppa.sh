@@ -44,7 +44,7 @@ fi
 
 echo
 
-# Check vendoring toolchains. Podman 6.0.2 requires Go 1.25.x and
+# Check vendoring toolchains. Podman 6.1.1 requires Go 1.25.x and
 # Netavark/Aardvark 2.1.0 require Rust 1.88.x. Noble's distro toolchains are
 # too old, so install official x86_64 toolchains in the VM for vendoring.
 info "Checking vendoring toolchains..."
@@ -52,8 +52,8 @@ if [[ -d /usr/local/go/bin ]]; then
     export PATH="/usr/local/go/bin:$PATH"
 fi
 GO_VER=$(go version 2>/dev/null | grep -oP 'go\K\d+\.\d+\.\d+' || true)
-if [[ -z "$GO_VER" || "$GO_VER" != 1.25.* ]] || ! dpkg --compare-versions "$GO_VER" ge "1.25.12"; then
-    warn "Go version is ${GO_VER:-missing}; expected Go 1.25.12 for Podman 6.0.2."
+if [[ -z "$GO_VER" || "$GO_VER" != 1.25.* ]] || ! dpkg --compare-versions "$GO_VER" ge "1.25.14"; then
+    warn "Go version is ${GO_VER:-missing}; expected Go 1.25.14 for Podman 6.1.1."
     warn "Install the x86_64 official Go 1.25.x tarball under /usr/local/go."
 else
     info "Go version: $GO_VER"

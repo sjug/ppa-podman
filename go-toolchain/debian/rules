@@ -12,7 +12,7 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	mkdir -p $(INSTALL_ROOT)
-	tar xzf go1.25.12.linux-arm64.tar.gz
+	tar xzf go1.25.14.linux-arm64.tar.gz
 	cp -a go/. $(INSTALL_ROOT)/
 	# Create convenience symlinks in the bin dir
 	mkdir -p $(CURDIR)/debian/go-toolchain-1.25/usr/bin

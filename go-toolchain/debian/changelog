@@ -1,3 +1,10 @@
+go-toolchain-1.25 (1.25.14~noble1) noble; urgency=medium
+
+  * Repackage official Go 1.25.14 standalone binary for aarch64
+  * Latest Go 1.25 patch; satisfies Podman 6.1.1 (go >= 1.25.9)
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Fri, 04 Sep 2026 10:13:57 -0400
+
 go-toolchain-1.25 (1.25.12~noble1) noble; urgency=medium
 
   * Repackage official Go 1.25.12 standalone binary for aarch64

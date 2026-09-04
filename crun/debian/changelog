@@ -1,3 +1,11 @@
+crun (1.29.1-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 1.29.1
+  * Fixes 1.29 regressions: /proc and /dev/shm mount modes, read-only /sys,
+    cgroup thawing, AppArmor detection
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Fri, 04 Sep 2026 10:13:57 -0400
+
 crun (1.29-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 1.29
