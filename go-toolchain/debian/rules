@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
 
 export DH_VERBOSE = 1
-GODIR = /usr/lib/go-1.25
-INSTALL_ROOT = $(CURDIR)/debian/go-toolchain-1.25$(GODIR)
+GODIR = /usr/lib/go-1.26
+INSTALL_ROOT = $(CURDIR)/debian/go-toolchain-1.26$(GODIR)
 
 %:
 	dh $@
@@ -12,12 +12,12 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	mkdir -p $(INSTALL_ROOT)
-	tar xzf go1.25.14.linux-arm64.tar.gz
+	tar xzf go1.26.8.linux-arm64.tar.gz
 	cp -a go/. $(INSTALL_ROOT)/
 	# Create convenience symlinks in the bin dir
-	mkdir -p $(CURDIR)/debian/go-toolchain-1.25/usr/bin
-	ln -sf ../lib/go-1.25/bin/go $(CURDIR)/debian/go-toolchain-1.25/usr/bin/go-1.25
-	ln -sf ../lib/go-1.25/bin/gofmt $(CURDIR)/debian/go-toolchain-1.25/usr/bin/gofmt-1.25
+	mkdir -p $(CURDIR)/debian/go-toolchain-1.26/usr/bin
+	ln -sf ../lib/go-1.26/bin/go $(CURDIR)/debian/go-toolchain-1.26/usr/bin/go-1.26
+	ln -sf ../lib/go-1.26/bin/gofmt $(CURDIR)/debian/go-toolchain-1.26/usr/bin/gofmt-1.26
 
 override_dh_auto_test:
 	# No tests

@@ -1,6 +1,6 @@
-# Podman 6.1.1 PPA for Ubuntu 24.04 Noble (arm64)
+# Podman 6.1.2 PPA for Ubuntu 24.04 Noble (arm64)
 
-Launchpad PPA packaging for Podman 6.1.1 and all dependencies for full
+Launchpad PPA packaging for Podman 6.1.2 and all dependencies for full
 rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 **PPA:** [`ppa:sejug/podman`](https://launchpad.net/~sejug/+archive/ubuntu/podman)
@@ -9,21 +9,21 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 
 | Package | Version | Language | Purpose |
 |---|---|---|---|
-| podman | 6.1.1 | Go | Container management tool |
-| podman-docker | 6.1.1 | Shell | Docker CLI emulation via podman |
+| podman | 6.1.2 | Go | Container management tool |
+| podman-docker | 6.1.2 | Shell | Docker CLI emulation via podman |
 | conmon | 2.2.1 | C | Container runtime monitor |
 | crun | 1.29.1 | C | Fast OCI runtime |
 | passt | 2026_07_28 | C | Rootless networking (pasta) |
 | netavark | 2.1.0 | Rust | Container network stack |
 | aardvark-dns | 2.1.0 | Rust | Container DNS server |
-| containers-common | common 0.69.1 | config | Shared config files |
-| go-toolchain-1.25 | 1.25.14 | binary | Go compiler for arm64 builds |
+| containers-common | common 0.69.2 | config | Shared config files |
+| go-toolchain-1.26 | 1.26.8 | binary | Go compiler for arm64 builds |
 | rust-toolchain-1.88 | 1.88.0 | binary | Rust compiler for arm64 builds |
 
 ### Design decisions
 
-- **Go 1.25 toolchain packaged in PPA**: Podman 6 requires Go 1.25.x, newer
-  than Noble provides. The latest Go 1.25.x standalone binary for aarch64 is
+- **Go 1.26 toolchain packaged in PPA**: Podman 6.1.2 requires Go 1.26.x, newer
+  than Noble provides. The latest Go 1.26.x standalone binary for aarch64 is
   repackaged as a .deb.
 - **Rust 1.88 toolchain packaged in PPA**: Netavark/Aardvark 2.1.0 require
   Rust 1.88, newer than Noble provides. The official Rust standalone binary
@@ -151,7 +151,7 @@ part of the remote path, not as the port number.
 
 ### Build steps
 
-Before vendoring Podman 6 sources, install the official x86_64 Go 1.25.x and
+Before vendoring Podman 6 sources, install the official x86_64 Go 1.26.x and
 Rust 1.88 toolchains in the VM. The arm64 toolchains are packaged in this PPA
 for Launchpad builds.
 
@@ -205,8 +205,8 @@ ppa-podman/
 │   ├── download-sources.sh         # Download & vendor upstream sources
 │   ├── build-source-packages.sh    # Build .dsc/.changes
 │   └── upload-ppa.sh              # Upload to Launchpad PPA
-├── podman/debian/                  # podman 6.1.1
-├── podman-docker/debian/           # podman-docker 6.1.1
+├── podman/debian/                  # podman 6.1.2
+├── podman-docker/debian/           # podman-docker 6.1.2
 ├── conmon/debian/                  # conmon 2.2.1
 ├── crun/debian/                    # crun 1.29.1
 ├── passt/debian/                   # passt 2026_07_28
@@ -219,6 +219,6 @@ ppa-podman/
 │   ├── policy.json
 │   ├── seccomp.json
 │   └── shortnames.conf
-├── go-toolchain/debian/            # go 1.25.x (arm64 binary repackage)
+├── go-toolchain/debian/            # go 1.26.x (arm64 binary repackage)
 └── rust-toolchain/debian/          # rust 1.88.0 (arm64 binary repackage)
 ```

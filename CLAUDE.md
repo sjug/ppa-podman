@@ -14,9 +14,9 @@ Each subdirectory is a standalone Debian source package with a `debian/` directo
 
 - **C packages** (conmon, crun, passt): standard make/autotools builds
 - **Rust packages** (netavark, aardvark-dns): cargo builds with vendored deps, require `rust-toolchain-1.88` from the PPA
-- **Go packages** (podman, podman-docker): make builds with vendored deps, require `go-toolchain-1.25` from the PPA
+- **Go packages** (podman, podman-docker): make builds with vendored deps, require `go-toolchain-1.26` from the PPA
 - **Config package** (containers-common): no compilation, ships storage.conf/registries.conf/etc
-- **Toolchain packages**: repackage official Go 1.25.x and Rust 1.88 aarch64 standalone binaries as .debs
+- **Toolchain packages**: repackage official Go 1.26.x and Rust 1.88 aarch64 standalone binaries as .debs
 
 ## Launchpad setup (one-time)
 
@@ -139,26 +139,26 @@ If the VM is recreated and SSH reports a changed host key:
 ssh-keygen -R '[localhost]:2222'
 ```
 
-### Installing Go 1.25.x and Rust 1.88 on the VM (required for vendoring)
+### Installing Go 1.26.x and Rust 1.88 on the VM (required for vendoring)
 
 The VM's distro toolchains are too old for Podman 6. Install official x86_64
 standalone toolchains on the VM before running `download-sources.sh`. Use the
-latest Go 1.25.x patch release (currently 1.25.14) and Rust 1.88.x to match the
+latest Go 1.26.x patch release (currently 1.26.8) and Rust 1.88.x to match the
 Launchpad arm64 toolchain packages.
 
 ```bash
 ssh -p 2222 YOUR_VM_USER@localhost
 
-# Go 1.25.x
+# Go 1.26.x
 sudo rm -rf /usr/local/go
-curl -sSL "https://go.dev/dl/go1.25.14.linux-amd64.tar.gz" | sudo tar -C /usr/local -xz
+curl -sSL "https://go.dev/dl/go1.26.8.linux-amd64.tar.gz" | sudo tar -C /usr/local -xz
 
 # Rust 1.88
 curl -sSL "https://static.rust-lang.org/dist/rust-1.88.0-x86_64-unknown-linux-gnu.tar.xz" | tar xJ
 cd rust-1.88.0-x86_64-unknown-linux-gnu && sudo ./install.sh --prefix=/usr/local
 ```
 
-After this, `go mod vendor` uses `/usr/local/go/bin/go` (1.25.x) and
+After this, `go mod vendor` uses `/usr/local/go/bin/go` (1.26.x) and
 `cargo vendor` uses `/usr/local/bin/cargo` (1.88.x), producing dependency trees
 that match what Launchpad builds with.
 
@@ -195,7 +195,7 @@ dput ppa:YOUR_LAUNCHPAD_USER/podman crun/crun_<version>_source.changes
 
 ## Critical gotchas learned from building this PPA
 
-- **Vendoring must use the target toolchain versions.** Noble has older Go/Rust toolchains; Podman 6 needs Go 1.25.x and Netavark/Aardvark 2.1.0 need Rust 1.88.x. Install official x86_64 Go/Rust toolchains on the build VM before running `go mod vendor` or `cargo vendor`.
+- **Vendoring must use the target toolchain versions.** Noble has older Go/Rust toolchains; Podman 6.1.2 needs Go 1.26.x and Netavark/Aardvark 2.1.0 need Rust 1.88.x. Install official x86_64 Go/Rust toolchains on the build VM before running `go mod vendor` or `cargo vendor`.
 
 - **Launchpad rejects re-uploads of orig tarballs with the same filename but different contents.** If you re-vendor and need a new orig tarball, change the upstream version string (e.g., append `+ds` suffix: `netavark_2.0.0+ds.orig.tar.gz`).
 
@@ -229,10 +229,10 @@ To re-upload a package with packaging changes only (no upstream version change),
 
 ## Upgrading to a new upstream version
 
-When a new upstream release comes out (e.g., podman 6.1.1):
+When a new upstream release comes out (e.g., podman 6.1.2):
 
 1. **Update `scripts/download-sources.sh`** — change the version in the relevant `pkg_*()` function
-2. **Update `debian/changelog`** — prepend a new version entry (e.g., `6.1.1-1ppa1~noble1`). Do NOT replace old entries — they are history.
+2. **Update `debian/changelog`** — prepend a new version entry (e.g., `6.1.2-1ppa1~noble1`). Do NOT replace old entries — they are history.
 3. **Update `scripts/build-source-packages.sh`** — change the version/tarball in the `build_quilt_package` line
 4. **Update `debian/control`** if build deps changed upstream (check Arch PKGBUILD diff for hints)
 5. **Update `README.md`** — version table, title, description, directory tree

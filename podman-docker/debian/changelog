@@ -1,3 +1,13 @@
+podman-docker (6.1.2-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream release 6.1.2 (fixes CVE-2025-11395: crafted layer
+    tarballs in podman load or symlinks in podman volume import could
+    overwrite host files)
+  * Build against container-libs/common v0.69.2
+  * Build with Go 1.26.8 toolchain from PPA (go-toolchain-1.26)
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Wed, 23 Sep 2026 08:59:20 -0400
+
 podman-docker (6.1.1-1ppa1~noble1) noble; urgency=medium
 
   * Docker CLI emulation using Podman 6.1.1

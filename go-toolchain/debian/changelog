@@ -1,3 +1,12 @@
+go-toolchain-1.26 (1.26.8~noble1) noble; urgency=medium
+
+  * New source package: repackage official Go 1.26.8 standalone binary for
+    aarch64, installed to /usr/lib/go-1.26
+  * Podman 6.1.2 requires go >= 1.26.0 (Buildah v1.45.1); Go 1.25 is end of
+    life now that Go 1.27 is released
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Wed, 23 Sep 2026 08:59:20 -0400
+
 go-toolchain-1.25 (1.25.14~noble1) noble; urgency=medium
 
   * Repackage official Go 1.25.14 standalone binary for aarch64

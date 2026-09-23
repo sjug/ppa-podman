@@ -78,16 +78,16 @@ info "Using maintainer: $PPA_MAINTAINER"
 
 # Ensure Go is on PATH for source builds. podman's `debian/rules clean` runs
 # `make`, which invokes `go`; the rules prepend the Launchpad path
-# /usr/lib/go-1.25/bin (absent on the build VM, which installs Go at
+# /usr/lib/go-1.26/bin (absent on the build VM, which installs Go at
 # /usr/local/go/bin), so a non-interactive run would otherwise fail with
 # "go: command not found". Mirrors download-sources.sh.
 if ! command -v go >/dev/null 2>&1; then
     if [[ -d /usr/local/go/bin ]]; then
         export PATH="/usr/local/go/bin:$PATH"
         info "Added /usr/local/go/bin to PATH"
-    elif [[ -d /usr/lib/go-1.25/bin ]]; then
-        export PATH="/usr/lib/go-1.25/bin:$PATH"
-        info "Added /usr/lib/go-1.25/bin to PATH"
+    elif [[ -d /usr/lib/go-1.26/bin ]]; then
+        export PATH="/usr/lib/go-1.26/bin:$PATH"
+        info "Added /usr/lib/go-1.26/bin to PATH"
     fi
 fi
 
@@ -179,6 +179,12 @@ build_native_package() {
     local src_dir="$work/${name}-${version}"
     mkdir -p "$work"
     cp -a "$BASEDIR/$name" "$src_dir"
+    # Native sources are the whole package directory, so drop outputs of
+    # earlier builds that were copied back into it; otherwise each upload
+    # bundles every previous .dsc/.tar.xz/.changes. Debian artifact names
+    # always contain "_"; upstream payloads (go*.tar.gz, rust-*.tar.xz) do not.
+    find "$src_dir" -maxdepth 1 -type f \( -name '*.dsc' -o -name '*_*.tar.*' \
+        -o -name '*.changes' -o -name '*.buildinfo' -o -name '*.upload' \) -delete
     apply_maintainer "$src_dir/debian"
 
     cd "$src_dir"
@@ -205,8 +211,8 @@ build_quilt_package "crun"         "1.29.1"                           "crun_1.29
 build_quilt_package "passt"        "0.0~git20260728.f8df3f1"        "passt_0.0~git20260728.f8df3f1.orig.tar.gz"
 build_quilt_package "netavark"     "2.1.0+ds"                       "netavark_2.1.0+ds.orig.tar.gz"
 build_quilt_package "aardvark-dns" "2.1.0+ds"                       "aardvark-dns_2.1.0+ds.orig.tar.gz"
-build_quilt_package "podman"       "6.1.1"                          "podman_6.1.1.orig.tar.gz"
-build_quilt_package "podman-docker" "6.1.1"                         "podman-docker_6.1.1.orig.tar.gz"
+build_quilt_package "podman"       "6.1.2"                          "podman_6.1.2.orig.tar.gz"
+build_quilt_package "podman-docker" "6.1.2"                         "podman-docker_6.1.2.orig.tar.gz"
 
 # Native package (no orig tarball)
 build_native_package "containers-common"

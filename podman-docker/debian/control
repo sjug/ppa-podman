@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Podman PPA Maintainer <maintainer@ppa>
 Build-Depends: debhelper-compat (= 13),
-               go-toolchain-1.25,
+               go-toolchain-1.26,
                go-md2man,
                libgpgme-dev,
                libseccomp-dev,

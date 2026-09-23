@@ -4,10 +4,10 @@ Priority: optional
 Maintainer: Podman PPA Maintainer <maintainer@ppa>
 Build-Depends: debhelper-compat (= 13),
                bash-completion,
-               containers-common (>= 1.0.0+common0.69.1~noble1),
+               containers-common (>= 1.0.0+common0.69.2~noble1),
                git,
                go-md2man,
-               go-toolchain-1.25,
+               go-toolchain-1.26,
                libapparmor-dev,
                libbtrfs-dev,
                libgpgme-dev,

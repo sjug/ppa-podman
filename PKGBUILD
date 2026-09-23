@@ -1,10 +1,11 @@
-# Maintainer: Morten Linderud <foxboron@archlinux.org>
 # Maintainer: David Runge <dvzrv@archlinux.org>
+# Maintainer: Robin Candau <antiz@archlinux.org>
+# Contributor: Morten Linderud <foxboron@archlinux.org>
 # Contributor: Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
 
 pkgbase=podman
 pkgname=(podman podman-docker)
-pkgver=6.1.1
+pkgver=6.1.2
 pkgrel=1
 pkgdesc='A tool for managing OCI containers and pods.'
 arch=(x86_64)
@@ -37,8 +38,8 @@ validpgpkeys=(
   7CE1E6F8C90CB53E7E4D8F2D502E08DB0BBF8EEE  # Ashley Cui <acui@redhat.com>
   9E33DD8704CC03E2DEB84D9A1C1EDD7CC7C3A0DD  # Lokesh Mandvekar <lsm5@redhat.com>
 )
-sha512sums=('37de59bafa8feeaa00d20db85dc630c06594566d42b7182bdc4bde8de391f9c56fd1844f2989aced737debcfd4ea9f1abc732f4cd19055017e5e2819dd6c004d')
-b2sums=('ab8a6d60f577d8c2b008ea44436cde9b81deb4fd162a69b37de079e9b44a150bd78d1cb78020fe7da207133a7ffb4124ee3a7ce3779ef127334e059975a4e40f')
+sha512sums=('440820c87a7563c2b3cda8641221fcabb20d8a0c6da5a11c8504e8c53870290a1b490b226fa71f17dbbafadfa4cf7a35d19691aa6f2557d60d688178c2e98a94')
+b2sums=('8db0660ac9563bf6c2f05fdfbbd4d94693ddb1d6c25495baf33bf4b842d9343d6ea5603fe90cd6d82287e6f073b6cd4a4d5781c400ff1ccd1e3e6664228b87ab')
 
 build() {
   export CGO_CPPFLAGS="${CPPFLAGS}"
