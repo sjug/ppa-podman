@@ -146,25 +146,25 @@ pkg_conmon() {
     info "conmon done."
 }
 
-# ---------- crun 1.29.1 ----------
+# ---------- crun 1.30.1 ----------
 pkg_crun() {
-    info "Downloading crun 1.29.1..."
+    info "Downloading crun 1.30.1..."
     cd "$TMPDIR"
-    curl -sSL -o crun-1.29.1.tar.gz \
-        "https://github.com/containers/crun/releases/download/1.29.1/crun-1.29.1.tar.gz"
-    cp crun-1.29.1.tar.gz "$BASEDIR/crun/crun_1.29.1.orig.tar.gz"
+    curl -sSL -o crun-1.30.1.tar.gz \
+        "https://github.com/containers/crun/releases/download/1.30.1/crun-1.30.1.tar.gz"
+    cp crun-1.30.1.tar.gz "$BASEDIR/crun/crun_1.30.1.orig.tar.gz"
     info "crun done."
 }
 
 # ---------- passt ----------
 pkg_passt() {
-    info "Downloading passt 2026_07_28.f8df3f1..."
+    info "Downloading passt 2026_09_25.df90211..."
     cd "$TMPDIR"
-    git clone --depth 1 --branch 2026_07_28.f8df3f1 \
-        https://passt.top/passt passt-0.0~git20260728.f8df3f1
-    rm -rf passt-0.0~git20260728.f8df3f1/.git
-    tar czf passt_0.0~git20260728.f8df3f1.orig.tar.gz passt-0.0~git20260728.f8df3f1/
-    cp passt_0.0~git20260728.f8df3f1.orig.tar.gz "$BASEDIR/passt/"
+    git clone --depth 1 --branch 2026_09_25.df90211 \
+        https://passt.top/passt passt-0.0~git20260925.df90211
+    rm -rf passt-0.0~git20260925.df90211/.git
+    tar czf passt_0.0~git20260925.df90211.orig.tar.gz passt-0.0~git20260925.df90211/
+    cp passt_0.0~git20260925.df90211.orig.tar.gz "$BASEDIR/passt/"
     info "passt done."
 }
 

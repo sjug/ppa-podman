@@ -207,8 +207,8 @@ build_native_package "rust-toolchain"
 
 # Quilt (upstream tarball) packages
 build_quilt_package "conmon"       "2.2.1"                          "conmon_2.2.1.orig.tar.gz"
-build_quilt_package "crun"         "1.29.1"                           "crun_1.29.1.orig.tar.gz"
-build_quilt_package "passt"        "0.0~git20260728.f8df3f1"        "passt_0.0~git20260728.f8df3f1.orig.tar.gz"
+build_quilt_package "crun"         "1.30.1"                           "crun_1.30.1.orig.tar.gz"
+build_quilt_package "passt"        "0.0~git20260925.df90211"        "passt_0.0~git20260925.df90211.orig.tar.gz"
 build_quilt_package "netavark"     "2.1.0+ds"                       "netavark_2.1.0+ds.orig.tar.gz"
 build_quilt_package "aardvark-dns" "2.1.0+ds"                       "aardvark-dns_2.1.0+ds.orig.tar.gz"
 build_quilt_package "podman"       "6.1.2"                          "podman_6.1.2.orig.tar.gz"

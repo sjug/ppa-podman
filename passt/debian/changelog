@@ -1,3 +1,12 @@
+passt (0.0~git20260925.df90211-1ppa1~noble1) noble; urgency=medium
+
+  * New upstream snapshot 2026_09_25.df90211
+  * Add missing O_CLOEXEC on the !HAS_GETRANDOM path; do not create the
+    isolation user namespace as nobody; vhost-user vq cleanup fix
+  * New pasta --no-pidns option
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Sat, 26 Sep 2026 07:33:24 -0400
+
 passt (0.0~git20260728.f8df3f1-1ppa1~noble1) noble; urgency=medium
 
   * New upstream snapshot 2026_07_28.f8df3f1

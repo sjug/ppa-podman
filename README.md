@@ -12,8 +12,8 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 | podman | 6.1.2 | Go | Container management tool |
 | podman-docker | 6.1.2 | Shell | Docker CLI emulation via podman |
 | conmon | 2.2.1 | C | Container runtime monitor |
-| crun | 1.29.1 | C | Fast OCI runtime |
-| passt | 2026_07_28 | C | Rootless networking (pasta) |
+| crun | 1.30.1 | C | Fast OCI runtime |
+| passt | 2026_09_25 | C | Rootless networking (pasta) |
 | netavark | 2.1.0 | Rust | Container network stack |
 | aardvark-dns | 2.1.0 | Rust | Container DNS server |
 | containers-common | common 0.69.2 | config | Shared config files |
@@ -208,8 +208,8 @@ ppa-podman/
 ├── podman/debian/                  # podman 6.1.2
 ├── podman-docker/debian/           # podman-docker 6.1.2
 ├── conmon/debian/                  # conmon 2.2.1
-├── crun/debian/                    # crun 1.29.1
-├── passt/debian/                   # passt 2026_07_28
+├── crun/debian/                    # crun 1.30.1
+├── passt/debian/                   # passt 2026_09_25
 ├── netavark/debian/                # netavark 2.1.0
 ├── aardvark-dns/debian/            # aardvark-dns 2.1.0
 ├── containers-common/              # config files + debian/

@@ -1,3 +1,15 @@
+crun (1.30.1-1ppa1~noble1) noble; urgency=high
+
+  * New upstream release 1.30.1 (1.30 + corrected CVE-2026-84042 fix)
+  * Security: CVE-2026-88264 (/dev/console symlink creates host file),
+    CVE-2026-88265 (/dev/null symlink exposes host file to container),
+    CVE-2026-84042 (krun+passt confinement)
+  * Fixes 1.29 regression dropping MS_REC on recursive propagation
+    (rslave mounts could propagate back to the host)
+  * Fixes crash on typeless mounts (CDI devices in user-namespaced pods)
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Sat, 26 Sep 2026 07:33:24 -0400
+
 crun (1.29.1-1ppa1~noble1) noble; urgency=medium
 
   * New upstream release 1.29.1
