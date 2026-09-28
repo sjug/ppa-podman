@@ -3,6 +3,7 @@ Section: net
 Priority: optional
 Maintainer: Podman PPA Maintainer <maintainer@ppa>
 Build-Depends: debhelper-compat (= 13),
+               dh-apparmor,
                gcc,
                libcap-dev
 Standards-Version: 4.6.2
@@ -11,6 +12,7 @@ Homepage: https://passt.top/
 Package: passt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: apparmor
 Description: User-mode networking for VMs and containers
  passt implements a translation layer between a Layer-2 network
  interface and native Layer-4 sockets on the host. pasta (Pack

@@ -35,7 +35,11 @@ rootless container support on Ubuntu 24.04 Noble arm64 (DGX Spark).
 - **nftables over iptables**: Podman 6 removed iptables support; netavark uses
   nftables.
 - **AppArmor support**: podman is built with `libapparmor-dev` so AppArmor
-  profiles work out of the box.
+  profiles work out of the box. Rootful containers run under podman's
+  generated `containers-default-<version>` profile; `podman` and `crun` rely on
+  the profiles shipped by Ubuntu's `apparmor` package. passt ships upstream's
+  `passt` and `pasta` profiles (with `pasta` hard-linked so its own profile
+  attaches); site-specific rules go in `/etc/apparmor.d/local/`.
 - **NVIDIA GPU support**: podman's postinst hook auto-generates the CDI
   specification (`/etc/cdi/nvidia.yaml`) if `nvidia-ctk` is present, with
   timestamped backups of existing configs. NVIDIA Container Toolkit is expected

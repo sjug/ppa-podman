@@ -1,0 +1,4 @@
+contrib/apparmor/usr.bin.passt etc/apparmor.d/
+contrib/apparmor/usr.bin.pasta etc/apparmor.d/
+contrib/apparmor/abstractions/passt etc/apparmor.d/abstractions/
+contrib/apparmor/abstractions/pasta etc/apparmor.d/abstractions/

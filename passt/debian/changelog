@@ -1,3 +1,16 @@
+passt (0.0~git20260925.df90211-1ppa2~noble1) noble; urgency=medium
+
+  * Ship upstream AppArmor profiles for passt and pasta (usr.bin.passt,
+    usr.bin.pasta, abstractions/passt, abstractions/pasta) and load them
+    with dh_apparmor; Build-Depends dh-apparmor, Suggests apparmor
+  * Install pasta as a hard link to passt instead of a symlink, so the pasta
+    profile attaches (AppArmor matches the resolved path)
+  * debian/patches/apparmor-local-includes.patch: include
+    local/usr.bin.passt and local/usr.bin.pasta for site-specific rules
+  * Build with hardening=+all
+
+ -- Podman PPA Maintainer <maintainer@ppa>  Mon, 28 Sep 2026 11:27:13 -0400
+
 passt (0.0~git20260925.df90211-1ppa1~noble1) noble; urgency=medium
 
   * New upstream snapshot 2026_09_25.df90211

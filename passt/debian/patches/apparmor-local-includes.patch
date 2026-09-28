@@ -1,0 +1,29 @@
+Description: Include site-local AppArmor overrides in passt and pasta profiles
+ dh_apparmor creates /etc/apparmor.d/local/usr.bin.passt and
+ /etc/apparmor.d/local/usr.bin.pasta, but the upstream profiles never include
+ them, so rules added there would be ignored. Include them, as Ubuntu's own
+ profiles do, so local denials can be allowed without editing the packaged
+ conffiles.
+Forwarded: not-needed
+Last-Update: 2026-09-28
+---
+--- a/contrib/apparmor/usr.bin.passt
++++ b/contrib/apparmor/usr.bin.passt
+@@ -47,4 +47,7 @@
+   /usr/bin/passt r,
+   owner @{run}/user/[0-9]*/libvirt/qemu/run/passt/* rw,
+   owner @{run}/libvirt/qemu/passt/* rw,
++
++  # Site-specific additions and overrides. See local/README for details.
++  include if exists <local/usr.bin.passt>
+ }
+--- a/contrib/apparmor/usr.bin.pasta
++++ b/contrib/apparmor/usr.bin.pasta
+@@ -27,4 +27,7 @@
+ 
+   owner @{HOME}/**			w,	# pcap(), pidfile_open(),
+ 						# pidfile_write()
++
++  # Site-specific additions and overrides. See local/README for details.
++  include if exists <local/usr.bin.pasta>
+ }

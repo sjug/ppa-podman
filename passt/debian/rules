@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 export DH_VERBOSE = 1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export VERSION = 2026_09_25.df90211
 
 %:
@@ -11,6 +12,12 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/passt prefix=/usr
+	# Upstream installs pasta as a symlink to passt. AppArmor attaches
+	# profiles by the resolved path, so a symlinked pasta would run under the
+	# passt profile instead of the pasta one. Hard-link it, as Debian does.
+	ln -f debian/passt/usr/bin/passt debian/passt/usr/bin/pasta
+	dh_apparmor --profile-name=usr.bin.passt -ppasst
+	dh_apparmor --profile-name=usr.bin.pasta -ppasst
 
 override_dh_auto_test:
 	# Tests require network namespaces
